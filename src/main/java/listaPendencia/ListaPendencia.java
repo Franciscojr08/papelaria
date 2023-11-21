@@ -34,6 +34,11 @@ public class ListaPendencia {
         this.dataCadastro = dados.dataCadastro();
         this.situacao = dados.situacao();
     }
+
+    public ListaPendencia(Long aLong, LocalDateTime localDateTime, LocalDateTime localDateTime1, SituacaoListaPendenciaEnum situacao, boolean entregue, List<DadosCadastroPendenciaLivroKitLivro> livros) {
+    }
+
+
     public void atualizarInformacoes(DadosAtualizacaoListaPendencia dados) {
         if (dados.situacao() != null) {
             this.situacao = SituacaoListaPendenciaEnum.valueOf(String.valueOf(dados.situacao()));
