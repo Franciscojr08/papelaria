@@ -6,9 +6,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import turma.Turma;
 
 import java.util.List;
-
 
 @Entity
 @Getter
@@ -23,13 +23,10 @@ public class Aluno {
     private String matricula;
     private boolean retirada;
     private String entrega;
-    @ManyToOne
-    @JoinColumn(name = "cliente_id")
+    @ManyToOne(fetch = FetchType.LAZY)
     private Cliente cliente;
-    @ManyToOne
-    @JoinColumn(name = "turma_id")
+    @Transient
     private Turma turma;
-
 
     public Aluno(String nome, String matricula, boolean retirada, String entrega, Cliente cliente, Turma turma) {
         this.nome = nome;
@@ -38,5 +35,26 @@ public class Aluno {
         this.entrega = entrega;
         this.cliente = cliente;
         this.turma = turma;
+    }
+
+    public static List<Aluno> listarTodos(AlunoRepository alunoRepository) {
+        return null;
+    }
+
+    public static Aluno listarPorId(AlunoRepository alunoRepository, Long id) {
+        return null;
+    }
+
+    public static List<Aluno> listarPorCliente(AlunoRepository alunoRepository, Long clienteId) {
+        return null;
+    }
+
+    public void cadastrar(AlunoRepository alunoRepository) {
+    }
+
+    public void atualizar(AlunoRepository alunoRepository) {
+    }
+
+    public void deletar(AlunoRepository alunoRepository) {
     }
 }
