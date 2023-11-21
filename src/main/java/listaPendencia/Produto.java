@@ -15,7 +15,7 @@ public class Produto {
  private int dataCadastro;
  private int pedidoId;
 
- private SituacaoPedidoEnum situacao;
+ private SituacaoListaPendenciaEnum situacao;
  private boolean entregue;
  private List<Map<String, Integer>> livro = new ArrayList<>();
  private List<Map<String, Integer>> kitLivro = new ArrayList<>();
