@@ -1,7 +1,9 @@
 package listaPendencia;
 
-public record DadosDetalhamentoListaPendencia(Long id, Cliente cliente, int dataCadastro, int dataEntrega, String situacao, boolean entregue, Produto produto) {
+import java.util.List;
+
+public record DadosDetalhamentoListaPendencia(Long id, Pedido pedido, int dataCadastro, int dataEntrega, SituacaoListaPendenciaEnum situacao, boolean entregue, List<DadosCadastroProduto> produto) {
     public DadosDetalhamentoListaPendencia(ListaPendencia listaPendencia){
-        this(listaPendencia.getId(), listaPendencia.getCliente(), listaPendencia.getDataCadastro(), listaPendencia.getDataEntrega(), listaPendencia.getSituacao(), listaPendencia.isEntregue(), listaPendencia.getProduto());
+        this(listaPendencia.getId(), listaPendencia.getPedido(), listaPendencia.getDataCadastro(), listaPendencia.getDataEntrega(), listaPendencia.getSituacao(), listaPendencia.isEntregue(), listaPendencia.getProduto());
     }
 }

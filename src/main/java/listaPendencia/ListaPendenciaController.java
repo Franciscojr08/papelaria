@@ -36,6 +36,7 @@ public class ListaPendenciaController {
         var page = repository.findById(paginacao).map(DadosListagemListaPendencia::new);
         return ResponseEntity.ok(page);
     }
+
     @PutMapping
     @Transactional
     public ResponseEntity atualizar(@RequestBody @Valid DadosAtualizacaoListaPendencia dados) {
@@ -44,13 +45,13 @@ public class ListaPendenciaController {
 
         return ResponseEntity.ok(new DadosDetalhamentoListaPendencia(listaPendencia));
     }
+
     @DeleteMapping("/{id}")
     @Transactional
     public ResponseEntity deletar(@PathVariable Long id) {
-        repository.deleteBy(id);
-//        var listaPendencia = repository.getReferenceById(id);
-//        listaPendencia.excluir();
-
+//        repository.deleteBy(id);
+        var listaPendencia = repository.getReferenceById(id);
+        listaPendencia.excluir();
         return ResponseEntity.noContent().build();
     }
 

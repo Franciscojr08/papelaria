@@ -6,6 +6,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
 @Entity
 @Getter @Setter
 @NoArgsConstructor
@@ -14,34 +17,39 @@ public class ListaPendencia {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "Cliente_id")
-    private Cliente cliente;
-    private int dataCadastro;
-    private int dataEntrega;
-    private String situacao;
+//    @JoinColumn(name = "pedido_id")
+    private Pedido pedido;
+    private LocalDateTime dataCadastro;
+    private LocalDateTime dataEntrega;
+    private SituacaoListaPendenciaEnum situacao;
     private boolean entregue;
 //    @OneToMany(fetch = FetchType.LAZY)
 //    @JoinColumn(name = "Produto_id")
-    @Embedded
-    private Produto produto;
+//    @Embedded
+    @Transient
+    private List<DadosCadastroProduto> produto;
 
     public ListaPendencia(DadosCadastroListaPendencia dados){
-        this.cliente = dados.cliente();
-        this.produto = dados.produto();
         this.dataEntrega = dados.dataEntrega();
         this.dataCadastro = dados.dataCadastro();
         this.situacao = dados.situacao();
     }
     public void atualizarInformacoes(DadosAtualizacaoListaPendencia dados) {
         if (dados.situacao() != null) {
-            this.situacao = dados.situacao();
+            this.situacao = SituacaoListaPendenciaEnum.valueOf(String.valueOf(dados.situacao()));
         }
-        if (dados.dataEntrega() != 0) {
+        if (dados.dataEntrega() != null) {
             this.dataEntrega = dados.dataEntrega();
+        }
+        if (dados.livros() != null) {
+            this.produto.addAll(dados.livros());
+        }
+        if (dados.kitLivros() != null) {
+            this.produto.addAll(dados.kitLivros());
         }
         if (dados.entregue()) {
             this.entregue = true;
-            this.situacao = "Entregue";
+            this.situacao = SituacaoListaPendenciaEnum.ENTREGUE;
         }
 
     }

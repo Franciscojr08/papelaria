@@ -1,23 +1,28 @@
 package listaPendencia;
 
-import jakarta.validation.constraints.NotBlank;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.validation.constraints.NotNull;
+
+import java.time.LocalDateTime;
+import java.util.List;
 
 public record DadosCadastroListaPendencia(
-        @NotBlank
-        Cliente cliente,
-        @NotBlank
-        int dataCadastro,
+        @NotNull
+        Long idPedido,
+        @NotNull
+        LocalDateTime dataCadastro,
 
-        int dataEntrega,
+        LocalDateTime dataEntrega,
 
-        @NotBlank
-        String situacao,
+        @NotNull @Enumerated(EnumType.STRING)
+        SituacaoListaPendenciaEnum situacao,
 
-        @NotBlank
+        @NotNull
         boolean entregue,
 
-        @NotBlank
-        Produto produto
+        List<DadosCadastroPendenciaLivroKitLivro> livros,
+        List<DadosCadastroPendenciaLivroKitLivro> kitLivros
 
 ) {
 

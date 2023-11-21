@@ -2,13 +2,19 @@ package listaPendencia;
 
 import jakarta.validation.constraints.NotNull;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
 public record DadosAtualizacaoListaPendencia(
         @NotNull
         Long id,
-        int dataEntrega,
-        String situacao,
+        LocalDateTime dataEntrega,
+        SituacaoListaPendenciaEnum situacao,
 
-        boolean entregue
+        boolean entregue,
+
+        List<DadosCadastroProduto> livros,
+        List<DadosCadastroProduto> kitLivros
 
 ) {
 }

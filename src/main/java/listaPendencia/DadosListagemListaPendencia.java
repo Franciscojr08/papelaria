@@ -1,7 +1,7 @@
 package listaPendencia;
 
-public record DadosListagemListaPendencia(Long id, Cliente cliente, String situacao) {
+public record DadosListagemListaPendencia(Long id, Pedido pedido, SituacaoListaPendenciaEnum situacao) {
     public DadosListagemListaPendencia(ListaPendencia listaPendencia){
-        this(listaPendencia.getId(), listaPendencia.getCliente(), listaPendencia.getSituacao());
+        this(listaPendencia.getId(), listaPendencia.getPedido(), listaPendencia.getSituacao());
     }
 }
