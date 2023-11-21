@@ -1,0 +1,29 @@
+package papelaria.ideal.api.listaPendencia;
+
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.validation.constraints.NotNull;
+import papelaria.ideal.api.livroKitLivro.DadosCadastroPedidoPedenciaLivroKitLivro;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+public record DadosCadastroListaPendencia(
+		@NotNull
+		Long idPedido,
+		@NotNull
+		LocalDateTime dataCadastro,
+
+		LocalDateTime dataEntrega,
+
+		@NotNull @Enumerated(EnumType.STRING)
+		SituacaoListaPendenciaEnum situacao,
+
+		@NotNull
+		boolean entregue,
+
+		List<DadosCadastroPedidoPedenciaLivroKitLivro> livros,
+		List<DadosCadastroPedidoPedenciaLivroKitLivro> kitLivros
+) {
+
+}
