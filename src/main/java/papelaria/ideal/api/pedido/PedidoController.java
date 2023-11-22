@@ -19,7 +19,7 @@ public class PedidoController {
 
 	@PostMapping
 	@Transactional
-	public ResponseEntity cadastrar(@RequestBody @Valid DadosCadastroPedido dados) {
+	public ResponseEntity<String> cadastrar(@RequestBody @Valid DadosCadastroPedido dados) {
 		pedidoService.cadastrar(dados);
 
 		return ResponseEntity.ok().body("Pedido cadastrado com sucesso!");
@@ -30,5 +30,12 @@ public class PedidoController {
 		var page = pedidoRepository.findAllByAtivoTrue(paginacao).map(DadosListagemPedido::new);
 
 		return ResponseEntity.ok().body(page);
+	}
+
+	@GetMapping("/{id}")
+	public ResponseEntity<DadosPedido> detalhar(@PathVariable Long id) {
+		var pedido = pedidoRepository.getReferenceById(id);
+
+		return ResponseEntity.ok().body(new DadosPedido(pedido));
 	}
 }

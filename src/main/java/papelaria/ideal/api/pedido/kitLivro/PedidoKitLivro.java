@@ -28,5 +28,5 @@ public class PedidoKitLivro {
 	private KitLivro kitLivro;
 
 	private Long quantidade;
-	private Float valor_unitario;
+	private Float valorUnitario;
 }

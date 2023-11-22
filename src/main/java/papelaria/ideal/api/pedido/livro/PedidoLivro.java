@@ -28,5 +28,5 @@ public class PedidoLivro {
 	private Livro livro;
 
 	private Long quantidade;
-	private Float valor_unitario;
+	private Float valorUnitario;
 }

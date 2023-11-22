@@ -1,3 +1,18 @@
+CREATE TABLE serie
+(
+    id   SMALLINT UNSIGNED PRIMARY KEY auto_increment,
+    nome varchar(50) not null
+);
+
+CREATE TABLE turma
+(
+    id       SMALLINT UNSIGNED PRIMARY KEY auto_increment,
+    nome     varchar(50)       not null,
+    serie_id SMALLINT UNSIGNED not null
+);
+
+alter table turma add constraint turma_serie_1 foreign key (serie_id) references serie (id);
+
 CREATE TABLE kit_livro
 (
     id                    SMALLINT UNSIGNED PRIMARY KEY auto_increment,
@@ -36,6 +51,21 @@ CREATE TABLE cliente
     ativo             boolean      not null default true
 );
 
+create table aluno
+(
+    id                     SMALLINT UNSIGNED PRIMARY KEY auto_increment,
+    nome                   varchar(100)      not null,
+    matricula              varchar(50)       null,
+    rg                     varchar(20)       null,
+    cpf                    VARCHAR(11)       null,
+    turma_id               SMALLINT UNSIGNED not null,
+    cliente_id_responsavel SMALLINT UNSIGNED not null,
+    ativo                  boolean           not null default true
+);
+
+alter table aluno add constraint aluno_turma_1 foreign key (turma_id) references turma (id);
+alter table aluno add constraint aluno_cliente_1 foreign key (cliente_id_responsavel) references cliente (id);
+
 CREATE TABLE pedido
 (
     id              SMALLINT UNSIGNED PRIMARY KEY auto_increment,
@@ -49,8 +79,7 @@ CREATE TABLE pedido
     ativo           boolean           not null default true
 );
 
-alter table pedido
-    add constraint pdo_cle1 foreign key (cliente_id) references cliente (id);
+alter table pedido add constraint pedido_cliente_1 foreign key (cliente_id) references cliente (id);
 
 CREATE TABLE pedido_livro
 (
@@ -61,10 +90,8 @@ CREATE TABLE pedido_livro
     livro_id       SMALLINT UNSIGNED not null
 );
 
-alter table pedido_livro
-    add constraint pdr_pdo1 foreign key (pedido_id) references pedido (id);
-alter table pedido_livro
-    add constraint pdr_lvo1 foreign key (livro_id) references livro (id);
+alter table pedido_livro add constraint pedidoLivro_pedido_1 foreign key (pedido_id) references pedido (id);
+alter table pedido_livro add constraint pedidoLivro_livro_1 foreign key (livro_id) references livro (id);
 
 CREATE TABLE pedido_kit_livro
 (
@@ -75,7 +102,5 @@ CREATE TABLE pedido_kit_livro
     kitlivro_id    SMALLINT UNSIGNED not null
 );
 
-alter table pedido_kit_livro
-    add constraint pdv_pdo1 foreign key (pedido_id) references pedido (id);
-alter table pedido_kit_livro
-    add constraint pdv_lvo1 foreign key (kitlivro_id) references kit_livro (id);
+alter table pedido_kit_livro add constraint pedidoLitLivro_pedido_1 foreign key (pedido_id) references pedido (id);
+alter table pedido_kit_livro add constraint pedidoLitLivro_livro_1 foreign key (kitlivro_id) references kit_livro (id);

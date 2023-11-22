@@ -25,6 +25,8 @@ public class Livro {
 	@OneToMany(mappedBy = "livro", fetch = FetchType.LAZY)
 	private List<PedidoLivro> pedidoLivro;
 
+	private String nome;
 	private Boolean ativo;
+	private String identificador;
 	private Long quantidadeDisponivel;
 }

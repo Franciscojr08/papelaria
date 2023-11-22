@@ -8,7 +8,9 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
 import papelaria.ideal.api.cliente.Cliente;
+import papelaria.ideal.api.pedido.kitLivro.DadosPedidoKitLivro;
 import papelaria.ideal.api.pedido.kitLivro.PedidoKitLivro;
+import papelaria.ideal.api.pedido.livro.DadosPedidoLivro;
 import papelaria.ideal.api.pedido.livro.PedidoLivro;
 import papelaria.ideal.api.utils.FormaPagamentoEnum;
 
@@ -78,5 +80,49 @@ public class Pedido {
 
 		var desconto = valor * (this.desconto / 100);
 		return valor - desconto;
+	}
+
+	public List<DadosPedidoLivro> getDadosPedidoLivro() {
+		if (this.pedidoLivro == null) {
+			return new ArrayList<>();
+		}
+
+		List<DadosPedidoLivro> dadosPedidoLivroList = new ArrayList<>();
+
+		for (PedidoLivro pedidoLivro : this.pedidoLivro) {
+			var dadosPedidoLivro = new DadosPedidoLivro(
+					pedidoLivro.getLivro().getIdentificador(),
+					pedidoLivro.getLivro().getNome(),
+					pedidoLivro.getQuantidade(),
+					pedidoLivro.getValorUnitario(),
+					pedidoLivro.getQuantidade() * pedidoLivro.getValorUnitario()
+			);
+
+			dadosPedidoLivroList.add(dadosPedidoLivro);
+		}
+
+		return dadosPedidoLivroList;
+	}
+
+	public List<DadosPedidoKitLivro> getDadosPedidoKitLivro() {
+		if (this.pedidoKitLivro == null) {
+			return new ArrayList<>();
+		}
+
+		List<DadosPedidoKitLivro> dadosPedidoKitLivroList = new ArrayList<>();
+
+		for (PedidoKitLivro pedidoKitLivro : this.pedidoKitLivro) {
+			var dadosPedidoKitLivro = new DadosPedidoKitLivro(
+					pedidoKitLivro.getKitLivro().getId(),
+					pedidoKitLivro.getKitLivro().getNome(),
+					pedidoKitLivro.getQuantidade(),
+					pedidoKitLivro.getValorUnitario(),
+					pedidoKitLivro.getQuantidade() * pedidoKitLivro.getValorUnitario()
+			);
+
+			dadosPedidoKitLivroList.add(dadosPedidoKitLivro);
+		}
+
+		return dadosPedidoKitLivroList;
 	}
 }
