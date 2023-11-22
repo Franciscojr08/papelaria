@@ -6,10 +6,6 @@ import lombok.Getter;
 public enum SituacaoListaPendenciaEnum {
     ENTREGUE,
     SOLICITADO,
-    PENDENTE
-    ;
+    PENDENTE;
 
-    SituacaoListaPendenciaEnum() {
-
-    }
 }

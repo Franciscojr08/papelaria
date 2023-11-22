@@ -13,8 +13,8 @@ public record DadosAtualizacaoListaPendencia(
 
         boolean entregue,
 
-        List<DadosCadastroProduto> livros,
-        List<DadosCadastroProduto> kitLivros
+        List<DadosCadastroLivroKitLivro> livros,
+        List<DadosCadastroLivroKitLivro> kitLivros
 
 ) {
 }

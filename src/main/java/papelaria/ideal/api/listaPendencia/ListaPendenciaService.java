@@ -2,12 +2,28 @@ package papelaria.ideal.api.listaPendencia;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import papelaria.ideal.api.kitLivro.KitLivroRepository;
+import papelaria.ideal.api.listaPendencia.listaPendenciaKitLivro.ListaPendenciaKitLivro;
+import papelaria.ideal.api.listaPendencia.listaPendenciaLivro.ListaPendenciaLivro;
+import papelaria.ideal.api.livro.LivroRepository;
+import papelaria.ideal.api.pedido.DadosCadastroPedidoLivroKitLivro;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class ListaPendenciaService {
     @Autowired
-    private ListaPendenciaRepository repository;
-    private void cadastrarListaLivro(DadosCadastroListaPendencia dados) {
+    private ListaPendenciaRepository listaPendenciaRepository;
+    @Autowired
+    private LivroRepository livroRepository;
+    @Autowired
+    private KitLivroRepository kitLivroRepository;
+
+    public void cadastrar(DadosCadastroListaPendencia dados){
+
+    }
+    public void cadastrarListaPendencia(DadosCadastroListaPendencia dados) {
         if (dados.livros().isEmpty()) {
             return;
         }
@@ -16,13 +32,22 @@ public class ListaPendenciaService {
                 dados.dataCadastro(),
                 dados.dataEntrega(),
                 dados.situacao(),
-                dados.entregue(),
-                dados.livros()
+                dados.entregue()
         );
+        var pendenciaLivro = getListaPendenciaLivro(dados, lista);
+        var pendenciaKitLivro = getListaPendenciaKitLivro(dados, lista);
 
-        repository.save(lista);
+        if (!pendenciaLivro.isEmpty()) {
+            lista.setListaPendenciaLivro(pendenciaLivro);
+        }
+
+        if (!pendenciaKitLivro.isEmpty()) {
+            lista.setListaPendenciaKitLivro(pendenciaKitLivro);
+        }
+
+        listaPendenciaRepository.save(lista);
     }
-    private void cadastrarListaKitLivro(DadosCadastroListaPendencia dados) {
+    public void cadastrarListaKitLivro(DadosCadastroListaPendencia dados) {
         if (dados.kitLivros().isEmpty()) {
             return;
         }
@@ -35,8 +60,47 @@ public class ListaPendenciaService {
                 dados.kitLivros()
         );
 
-        repository.save(lista);
+        listaPendenciaRepository.save(lista);
     }
+    private List<ListaPendenciaLivro> getListaPendenciaLivro(DadosCadastroListaPendencia dados, ListaPendencia listaPendencia) {
+        if (dados.livros() == null) {
+            return new ArrayList<>();
+        }
+        List<ListaPendenciaLivro> listaPendenciaLivroList = new ArrayList<>();
+        for (DadosCadastroPendenciaLivroKitLivro dadosLivro : dados.livros()) {
+            var livro = livroRepository.getReferenceById(dadosLivro.id());
+
+            var listaPendenciaLivro = new ListaPendenciaLivro(
+                    null,
+                    listaPendencia,
+                    livro,
+                    dadosLivro.quantidadeSolicitada()
+            );
+            listaPendenciaLivroList.add(listaPendenciaLivro);
+        }
+
+        return listaPendenciaLivroList;
+    }
+    private List<ListaPendenciaKitLivro> getListaPendenciaKitLivro(DadosCadastroListaPendencia dados, ListaPendencia listaPendencia) {
+        if (dados.kitLivros() == null) {
+            return new ArrayList<>();
+        }
+        List<ListaPendenciaKitLivro> listaPendenciaKitLivroList = new ArrayList<>();
+        for (DadosCadastroPendenciaLivroKitLivro dadosKitLivro : dados.livros()) {
+            var kitLivro = kitLivroRepository.getReferenceById(dadosKitLivro.id());
+
+            var listaPendenciaKitLivro = new ListaPendenciaKitLivro(
+                    null,
+                    listaPendencia,
+                    kitLivro,
+                    dadosKitLivro.quantidadeSolicitada()
+            );
+            listaPendenciaKitLivroList.add(listaPendenciaKitLivro);
+        }
+
+        return listaPendenciaKitLivroList;
+    }
+
 
 //    private void cadastrarPedidoLivro(DadosCadastroListaPendencia dados, Pedido pedido) {
 //        if (dados.livros().isEmpty()) {
