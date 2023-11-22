@@ -23,27 +23,14 @@ public class Cliente {
     private String nome;
     private String cpf;
     private String telefone;
+
     @Transient
     private Endereco endereco;
-    private boolean responsavelAluno;
+    private Boolean responsavelAluno;
+
     @ManyToOne(fetch = FetchType.LAZY)
     private Aluno aluno;
 
-    public static List<Cliente> listarTodos(ClienteRepository clienteRepository) {
-        return clienteRepository.findAll();
-}
-
-    public static Cliente listarPorId(ClienteRepository clienteRepository, Long id) {
-        return clienteRepository.findById(id).orElse(null);
-    }
-
-    public void cadastrar(ClienteRepository clienteRepository) {
-        clienteRepository.save(this);
-    }
-
-    public void atualizar(ClienteRepository clienteRepository) {
-        clienteRepository.save(this);
-    }
 
     public void deletar(ClienteRepository clienteRepository, AlunoRepository alunoRepository) {
         if (this.aluno != null) {
