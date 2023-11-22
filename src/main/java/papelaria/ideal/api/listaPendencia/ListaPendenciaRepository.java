@@ -1,4 +1,4 @@
-package listaPendencia;
+package papelaria.ideal.api.listaPendencia;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

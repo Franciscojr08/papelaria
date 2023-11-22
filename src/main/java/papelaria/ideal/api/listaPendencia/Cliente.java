@@ -1,12 +1,10 @@
-package listaPendencia;
+package papelaria.ideal.api.listaPendencia;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
-import lombok.Getter;
 
-@Getter
 @Entity
-public class Pedido {
+public class Cliente {
     @Id
     private Long id;
 
@@ -14,4 +12,7 @@ public class Pedido {
         this.id = id;
     }
 
+    public Long getId() {
+        return id;
+    }
 }

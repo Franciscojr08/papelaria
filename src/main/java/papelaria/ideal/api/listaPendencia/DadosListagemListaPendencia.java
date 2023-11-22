@@ -1,4 +1,4 @@
-package listaPendencia;
+package papelaria.ideal.api.listaPendencia;
 
 public record DadosListagemListaPendencia(Long id, Pedido pedido, SituacaoListaPendenciaEnum situacao) {
     public DadosListagemListaPendencia(ListaPendencia listaPendencia){

@@ -1,4 +1,4 @@
-package listaPendencia;
+package papelaria.ideal.api.listaPendencia;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

@@ -1,11 +1,10 @@
-package listaPendencia;
+package papelaria.ideal.api.listaPendencia;
 
 
 import lombok.Getter;
 import lombok.Setter;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 @Getter

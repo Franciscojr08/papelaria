@@ -1,4 +1,4 @@
-package listaPendencia;
+package papelaria.ideal.api.listaPendencia;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
