@@ -26,7 +26,6 @@ public class ValidadorKitLivroAtivo implements ValidadorPedidoInterface {
 			}
 		}
 
-
 		for (DadosCadastroPedidoLivroKitLivro livro : dados.kitLivros()) {
 			if (kitLivroRepository.existsByIdAndAtivoFalse(livro.id())) {
 				throw new ValidacaoException(
