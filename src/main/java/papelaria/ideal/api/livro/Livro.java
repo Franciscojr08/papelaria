@@ -5,10 +5,10 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import papelaria.ideal.api.pedido.Pedido;
+import papelaria.ideal.api.listaPendencia.listaPendenciaLivro.ListaPendenciaLivro;
 import papelaria.ideal.api.pedido.livro.PedidoLivro;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -25,8 +25,15 @@ public class Livro {
 	@OneToMany(mappedBy = "livro", fetch = FetchType.LAZY)
 	private List<PedidoLivro> pedidoLivro;
 
-	private String nome;
-	private Boolean ativo;
+	@OneToMany(mappedBy = "livro", fetch = FetchType.LAZY)
+	private List<ListaPendenciaLivro> listaPendenciaLivro;
+
 	private String identificador;
+	private String nome;
+	private Boolean usoInterno;
+	private Float valor;
 	private Long quantidadeDisponivel;
+	private LocalDateTime dataCadastro;
+	private LocalDateTime dataAtualizacao;
+	private Boolean ativo;
 }

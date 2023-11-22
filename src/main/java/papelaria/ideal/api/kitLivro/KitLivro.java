@@ -5,8 +5,10 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import papelaria.ideal.api.listaPendencia.listaPendenciaKitLivro.ListaPendenciaKitLivro;
 import papelaria.ideal.api.pedido.kitLivro.PedidoKitLivro;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -23,7 +25,14 @@ public class KitLivro {
 	@OneToMany(mappedBy = "kitLivro", fetch = FetchType.LAZY)
 	private List<PedidoKitLivro> pedidoKitLivro;
 
+	@OneToMany(mappedBy = "kitLivro", fetch = FetchType.LAZY)
+	private List<ListaPendenciaKitLivro> listaPendenciaKitLivro;
+
 	private String nome;
-	private Boolean ativo;
+	private String descricao;
+	private Float valor;
 	private Long quantidadeDisponivel;
+	private LocalDateTime dataCadastro;
+	private LocalDateTime dataAtualizacao;
+	private Boolean ativo;
 }

@@ -29,12 +29,7 @@ public class TratarErros {
 		);
 	}
 
-	@ExceptionHandler(Exception.class)
-	public ResponseEntity tratarErro(Exception exp) {
-		return ResponseEntity.internalServerError().body(
-				"Me desculpe, ocorreu um erro interno no sistema!"
-		);
-	}
+
 
 	@ExceptionHandler(ValidacaoException.class)
 	public ResponseEntity tratarErroRegraDeNegocio(ValidacaoException ex) {

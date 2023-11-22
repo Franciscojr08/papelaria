@@ -11,11 +11,11 @@ public record DadosListagemPedido(
 		Long id,
 		LocalDateTime dataPedido,
 		String nome_cliente,
-		Long quantidade_livros,
-		Long quantidade_kit_livros,
+		Long quantidadeLivros,
+		Long quantidadeKitLivros,
 		Float valor,
 		Float desconto,
-		Float valor_total,
+		Float valorTotal,
 		FormaPagamentoEnum formaPagamento,
 		SituacaoPedidoEnum situacao
 ) {

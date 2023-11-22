@@ -111,10 +111,10 @@ public class PedidoService {
 				var pendenciaLivro = new DadosCadastroPendenciaLivroKitLivro(livro.getId(),diffQuantidade);
 
 				listaPendenciaLivro.add(pendenciaLivro);
-				livroService.atualizarQuantidade(0L);
+				livroService.atualizarQuantidade(livro.getId(),0L);
 			} else {
 				var quantidade = livro.getQuantidadeDisponivel() - dadosLivro.quantidadeSolicitada();
-				livroService.atualizarQuantidade(quantidade);
+				livroService.atualizarQuantidade(livro.getId(),quantidade);
 			}
 
 			var pedidoLivro = new PedidoLivro(
@@ -145,10 +145,10 @@ public class PedidoService {
 				var pendenciaKitLivro = new DadosCadastroPendenciaLivroKitLivro(kitLivro.getId(),diffQuantidade);
 
 				listaPendenciaKitLivro.add(pendenciaKitLivro);
-				kitLivroService.atualizarQuantidade(0L);
+				kitLivroService.atualizarQuantidade(kitLivro.getId(),0L);
 			} else {
 				var quantidade = kitLivro.getQuantidadeDisponivel() - dadosKitLivro.quantidadeSolicitada();
-				kitLivroService.atualizarQuantidade(quantidade);
+				kitLivroService.atualizarQuantidade(kitLivro.getId(),quantidade);
 			}
 
 			var pedidoKitLivro = new PedidoKitLivro(
@@ -173,7 +173,7 @@ public class PedidoService {
 				pedido.getId(),
 				pedido.getDataPedido(),
 				null,
-				SituacaoListaPendenciaEnum.PENDENTE,
+				SituacaoListaPendenciaEnum.CANCELADA,
 				false,
 				listaPendenciaLivro,
 				listaPendenciaKitLivro

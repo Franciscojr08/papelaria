@@ -9,6 +9,7 @@ import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
 import papelaria.ideal.api.cliente.Cliente;
 import papelaria.ideal.api.errors.ValidacaoException;
+import papelaria.ideal.api.listaPendencia.ListaPendencia;
 import papelaria.ideal.api.pedido.kitLivro.DadosPedidoKitLivro;
 import papelaria.ideal.api.pedido.kitLivro.PedidoKitLivro;
 import papelaria.ideal.api.pedido.livro.DadosPedidoLivro;
@@ -17,7 +18,6 @@ import papelaria.ideal.api.utils.FormaPagamentoEnum;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.IllegalFormatCodePointException;
 import java.util.List;
 
 @Data
@@ -31,15 +31,23 @@ public class Pedido {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@Enumerated(EnumType.STRING)
-	private FormaPagamentoEnum formaPagamento;
+	private Float valor;
+	private Float desconto;
 
 	@Enumerated(EnumType.STRING)
 	private SituacaoPedidoEnum situacaoPedido;
 
+	@Enumerated(EnumType.STRING)
+	private FormaPagamentoEnum formaPagamento;
+
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "cliente_id")
 	private Cliente cliente;
+
+	private LocalDateTime dataPedido;
+	private LocalDateTime dataEntrega;
+	private LocalDateTime dataAtualizacao;
+	private Boolean ativo;
 
 	@Cascade({CascadeType.ALL})
 	@OneToMany(mappedBy = "pedido", fetch = FetchType.LAZY)
@@ -49,11 +57,8 @@ public class Pedido {
 	@OneToMany(mappedBy = "pedido", fetch = FetchType.LAZY)
 	private List<PedidoKitLivro> pedidoKitLivro = new ArrayList<>();
 
-	private LocalDateTime dataPedido;
-	private Float valor;
-	private Float desconto;
-	private LocalDateTime dataEntrega;
-	private Boolean ativo;
+	@OneToOne(mappedBy = "pedido", fetch = FetchType.LAZY)
+	private ListaPendencia listaPendencia;
 
 	public Pedido(
 			LocalDateTime dataPedido,
@@ -152,5 +157,7 @@ public class Pedido {
 		if (dados.formaPagamento() != null) {
 			this.formaPagamento = dados.formaPagamento();
 		}
+
+		this.dataAtualizacao = LocalDateTime.now();
 	}
 }

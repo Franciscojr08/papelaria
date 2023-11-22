@@ -19,12 +19,12 @@ public class PedidoKitLivro {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "pedido_id")
 	private Pedido pedido;
 
-	@ManyToOne
-	@JoinColumn(name = "kitlivro_id")
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "kit_livro_id")
 	private KitLivro kitLivro;
 
 	private Long quantidade;

@@ -8,21 +8,17 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public record DadosCadastroListaPendencia(
-		@NotNull
-		Long idPedido,
-		@NotNull
-		LocalDateTime dataCadastro,
-
-		LocalDateTime dataEntrega,
-
-		@NotNull @Enumerated(EnumType.STRING)
-		SituacaoListaPendenciaEnum situacao,
-
-		@NotNull
-		boolean entregue,
-
-		List<DadosCadastroPendenciaLivroKitLivro> livros,
-		List<DadosCadastroPendenciaLivroKitLivro> kitLivros
+        @NotNull
+        Long pedidoId,
+        @NotNull
+        LocalDateTime dataCadastro,
+        LocalDateTime dataEntrega,
+        @NotNull
+        @Enumerated(EnumType.STRING)
+        SituacaoListaPendenciaEnum situacao,
+        @NotNull
+        Boolean entregue,
+        List<DadosCadastroPendenciaLivroKitLivro> livros,
+        List<DadosCadastroPendenciaLivroKitLivro> kitLivros
 ) {
-
 }
