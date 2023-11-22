@@ -16,15 +16,15 @@ public class ListaPendenciaController {
     @Autowired
     private ListaPendenciaRepository repository;
 
-    @PostMapping
-    @Transactional
-    public ResponseEntity cadastrar(@RequestBody @Valid DadosCadastroListaPendencia dados, UriComponentsBuilder uriBuilder) {
-        var pendencia = new ListaPendencia(dados);
-        repository.save(pendencia);
-
-        var uri = uriBuilder.path("/pendencia/{id}").buildAndExpand(pendencia.getId()).toUri();
-        return ResponseEntity.created(uri).body(new DadosDetalhamentoListaPendencia(pendencia));
-    }
+//    @PostMapping
+//    @Transactional
+//    public ResponseEntity cadastrar(@RequestBody @Valid DadosCadastroListaPendencia dados, UriComponentsBuilder uriBuilder) {
+//        var pendencia = new ListaPendencia(dados);
+//        repository.save(pendencia);
+//
+//        var uri = uriBuilder.path("/pendencia/{id}").buildAndExpand(pendencia.getId()).toUri();
+//        return ResponseEntity.created(uri).body(new DadosDetalhamentoListaPendencia(pendencia));
+//    }
     @GetMapping
     public ResponseEntity<Page<DadosListagemListaPendencia>> listar(@PageableDefault(size = 10, sort = {"nome"}) Pageable paginacao) {
         var page = repository.findAllByEntregueFalse(paginacao).map(DadosListagemListaPendencia::new);

@@ -38,12 +38,12 @@ public class ListaPendenciaService {
         repository.save(lista);
     }
 
-//    private void cadastrarPedidoLivro(DadosCadastroPedido dados, Pedido pedido) {
+//    private void cadastrarPedidoLivro(DadosCadastroListaPendencia dados, Pedido pedido) {
 //        if (dados.livros().isEmpty()) {
 //            return;
 //        }
 //
-//        for (DadosCadastroPedidoPedenciaLivroKitLivro dadosLivro : dados.livros()) {
+//        for (DadosCadastroPendenciaLivroKitLivro dadosLivro : dados.livros()) {
 //            var livro = livroRepository.getReferenceById(dadosLivro.id());
 //
 //            if (livro.getQuantidade() < dadosLivro.quantidade()) {
@@ -82,5 +82,5 @@ public class ListaPendenciaService {
 //
 //            pedidoRepository.savePedidoKitLivro(dadosKitLivro.quantidade(), pedido.getId(), kitLivro.getId());
 //        }
-//    }
+
 }
