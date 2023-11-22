@@ -38,4 +38,23 @@ public class PedidoController {
 
 		return ResponseEntity.ok().body(new DadosPedido(pedido));
 	}
+
+	@PutMapping
+	@Transactional
+	public ResponseEntity<DadosPedido> atualizar(@RequestBody @Valid DadosAtualizacaoPedido dados) {
+		var pedido = pedidoRepository.getReferenceById(dados.id());
+		pedido.atualizarInformacoes(dados);
+
+		return ResponseEntity.ok().body(new DadosPedido(pedido));
+	}
+
+	@DeleteMapping("/{id}")
+	@Transactional
+	public ResponseEntity deletar(@PathVariable Long id) {
+		var pedido = pedidoRepository.getReferenceById(id);
+		pedido.setAtivo(false);
+		pedido.setSituacaoPedido(SituacaoPedidoEnum.CANCELADO);
+
+		return ResponseEntity.noContent().build();
+	}
 }

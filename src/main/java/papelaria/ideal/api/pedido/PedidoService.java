@@ -64,6 +64,10 @@ public class PedidoService {
 				"Adicione ao menos um livro ou kit de livro ao pedido."
 			);
 		}
+
+		if (dados.dataEntrega() != null && dados.dataEntrega().isBefore(dados.dataPedido())) {
+			throw new ValidacaoException("A data de entrega não pode ser inferior a data do pedido.");
+		}
 	}
 
 	private Pedido cadastrarPedido(DadosCadastroPedido dados, Cliente cliente) {

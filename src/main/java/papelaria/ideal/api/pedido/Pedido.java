@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
 import papelaria.ideal.api.cliente.Cliente;
+import papelaria.ideal.api.errors.ValidacaoException;
 import papelaria.ideal.api.pedido.kitLivro.DadosPedidoKitLivro;
 import papelaria.ideal.api.pedido.kitLivro.PedidoKitLivro;
 import papelaria.ideal.api.pedido.livro.DadosPedidoLivro;
@@ -16,6 +17,7 @@ import papelaria.ideal.api.utils.FormaPagamentoEnum;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.IllegalFormatCodePointException;
 import java.util.List;
 
 @Data
@@ -124,5 +126,31 @@ public class Pedido {
 		}
 
 		return dadosPedidoKitLivroList;
+	}
+
+	public void atualizarInformacoes(DadosAtualizacaoPedido dados) {
+		if (dados.dataPedido() != null) {
+			this.dataPedido = dados.dataPedido();
+		}
+
+		if (dados.dataEntrega() != null) {
+			if (dados.dataEntrega().isBefore(this.dataPedido)) {
+				throw new ValidacaoException("A data de entrega não pode ser inferior a data do pedido.");
+			}
+
+			this.dataEntrega = dados.dataEntrega();
+		}
+
+		if (dados.desconto() != null) {
+			this.desconto = dados.desconto();
+		}
+
+		if (dados.situacaoPedido() != null) {
+			this.situacaoPedido = dados.situacaoPedido();
+		}
+
+		if (dados.formaPagamento() != null) {
+			this.formaPagamento = dados.formaPagamento();
+		}
 	}
 }
