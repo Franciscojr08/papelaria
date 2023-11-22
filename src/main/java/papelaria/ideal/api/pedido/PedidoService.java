@@ -1,7 +1,6 @@
 package papelaria.ideal.api.pedido;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import papelaria.ideal.api.cliente.Cliente;
 import papelaria.ideal.api.cliente.ClienteRepository;
@@ -9,13 +8,14 @@ import papelaria.ideal.api.errors.ValidacaoException;
 import papelaria.ideal.api.kitLivro.KitLivroRepository;
 import papelaria.ideal.api.kitLivro.KitLivroService;
 import papelaria.ideal.api.listaPendencia.DadosCadastroListaPendencia;
+import papelaria.ideal.api.listaPendencia.DadosCadastroPendenciaLivroKitLivro;
 import papelaria.ideal.api.listaPendencia.ListaPendenciaService;
 import papelaria.ideal.api.listaPendencia.SituacaoListaPendenciaEnum;
 import papelaria.ideal.api.livro.LivroRepository;
 import papelaria.ideal.api.livro.LivroService;
-import papelaria.ideal.api.livroKitLivro.LivroKitLivroServiceInterface;
+import papelaria.ideal.api.pedido.kitLivro.PedidoKitLivro;
+import papelaria.ideal.api.pedido.livro.PedidoLivro;
 import papelaria.ideal.api.pedido.validacoes.ValidadorPedidoInterface;
-import papelaria.ideal.api.livroKitLivro.DadosCadastroPedidoPedenciaLivroKitLivro;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,8 +39,8 @@ public class PedidoService {
 	private LivroService livroService;
 	@Autowired
 	private KitLivroService kitLivroService;
-	private final List<DadosCadastroPedidoPedenciaLivroKitLivro> listaPendenciaLivro = new ArrayList<>();
-	private final List<DadosCadastroPedidoPedenciaLivroKitLivro> listaPendenciaKitLivro = new ArrayList<>();
+	private final List<DadosCadastroPendenciaLivroKitLivro> listaPendenciaLivro = new ArrayList<>();
+	private final List<DadosCadastroPendenciaLivroKitLivro> listaPendenciaKitLivro = new ArrayList<>();
 
 	public void cadastrar(DadosCadastroPedido dados) {
 		validarIntegridadePedido(dados);
@@ -50,8 +50,6 @@ public class PedidoService {
 		var cliente = clienteRepository.getReferenceById(dados.clienteId());
 		var pedido = cadastrarPedido(dados, cliente);
 
-		cadastrarPedidoLivro(dados,pedido);
-		cadastrarPedidoKitLivro(dados,pedido);
 		verificarNecessidadeCadastroListaPendencia(pedido);
 	}
 
@@ -60,7 +58,7 @@ public class PedidoService {
 			throw new ValidacaoException("O cliente informado é inválido ou não está cadastrado.");
 		}
 
-		if (dados.livros().isEmpty() && dados.kitLivros().isEmpty()) {
+		if (dados.livros() == null && dados.kitLivros() == null) {
 			throw new ValidacaoException(
 				"Não é possível cadastrar um pedido sem livro ou kit de livro. " +
 				"Adicione ao menos um livro ou kit de livro ao pedido."
@@ -70,7 +68,6 @@ public class PedidoService {
 
 	private Pedido cadastrarPedido(DadosCadastroPedido dados, Cliente cliente) {
 		var pedido = new Pedido(
-				null,
 				dados.dataPedido(),
 				dados.valor(),
 				dados.desconto(),
@@ -81,53 +78,86 @@ public class PedidoService {
 				true
 		);
 
+		var pedidoLivro = getPedidoLivro(dados,pedido);
+		var pedidoKitLivro = getPedidoKitLivro(dados,pedido);
+
+		if (!pedidoLivro.isEmpty()) {
+			pedido.setPedidoLivro(pedidoLivro);
+		}
+
+		if (!pedidoKitLivro.isEmpty()) {
+			pedido.setPedidoKitLivro(pedidoKitLivro);
+		}
+
 		return pedidoRepository.save(pedido);
 	}
 
-	private void cadastrarPedidoLivro(DadosCadastroPedido dados, Pedido pedido) {
-		if (dados.livros().isEmpty()) {
-			return;
+	private List<PedidoLivro> getPedidoLivro(DadosCadastroPedido dados, Pedido pedido) {
+		if (dados.livros() == null) {
+			return new ArrayList<>();
 		}
 
-		for (DadosCadastroPedidoPedenciaLivroKitLivro dadosLivro : dados.livros()) {
+		List<PedidoLivro> pedidoLivroList = new ArrayList<>();
+
+		for (DadosCadastroPedidoLivroKitLivro dadosLivro : dados.livros()) {
 			var livro = livroRepository.getReferenceById(dadosLivro.id());
 
-			if (livro.getQuantidade() < dadosLivro.quantidade()) {
-				var diffQuantidade = dadosLivro.quantidade() - livro.getQuantidade();
-				var pendenciaLivro = new DadosCadastroPedidoPedenciaLivroKitLivro(livro.getId(),diffQuantidade);
+			if (livro.getQuantidadeDisponivel() < dadosLivro.quantidadeSolicitada()) {
+				var diffQuantidade = dadosLivro.quantidadeSolicitada() - livro.getQuantidadeDisponivel();
+				var pendenciaLivro = new DadosCadastroPendenciaLivroKitLivro(livro.getId(),diffQuantidade);
 
 				listaPendenciaLivro.add(pendenciaLivro);
 				livroService.atualizarQuantidade(0L);
 			} else {
-				var quantidade = livro.getQuantidade() - dadosLivro.quantidade();
+				var quantidade = livro.getQuantidadeDisponivel() - dadosLivro.quantidadeSolicitada();
 				livroService.atualizarQuantidade(quantidade);
 			}
 
-			pedidoRepository.savePedidoLivro(dadosLivro.quantidade(), pedido.getId(), livro.getId());
+			var pedidoLivro = new PedidoLivro(
+					null,
+					pedido,
+					livro,
+					dadosLivro.quantidadeSolicitada(),
+					dadosLivro.valorUnitario()
+			);
+			pedidoLivroList.add(pedidoLivro);
 		}
+
+		return pedidoLivroList;
 	}
 
-	private void cadastrarPedidoKitLivro(DadosCadastroPedido dados, Pedido pedido) {
-		if (dados.kitLivros().isEmpty()) {
-			return;
+	private List<PedidoKitLivro> getPedidoKitLivro(DadosCadastroPedido dados, Pedido pedido) {
+		if (dados.kitLivros() == null) {
+			return new ArrayList<>();
 		}
 
-		for (DadosCadastroPedidoPedenciaLivroKitLivro dadosKitLivro : dados.kitLivros()) {
+		List<PedidoKitLivro> pedidoKitLivroList = new ArrayList<>();
+
+		for (DadosCadastroPedidoLivroKitLivro dadosKitLivro : dados.kitLivros()) {
 			var kitLivro = kitLivroRepository.getReferenceById(dadosKitLivro.id());
 
-			if (kitLivro.getQuantidade() < dadosKitLivro.quantidade()) {
-				var diffQuantidade = dadosKitLivro.quantidade() - kitLivro.getQuantidade();
-				var pendenciaKitLivro = new DadosCadastroPedidoPedenciaLivroKitLivro(kitLivro.getId(),diffQuantidade);
+			if (kitLivro.getQuantidadeDisponivel() < dadosKitLivro.quantidadeSolicitada()) {
+				var diffQuantidade = dadosKitLivro.quantidadeSolicitada() - kitLivro.getQuantidadeDisponivel();
+				var pendenciaKitLivro = new DadosCadastroPendenciaLivroKitLivro(kitLivro.getId(),diffQuantidade);
 
 				listaPendenciaKitLivro.add(pendenciaKitLivro);
 				kitLivroService.atualizarQuantidade(0L);
 			} else {
-				var quantidade = kitLivro.getQuantidade() - dadosKitLivro.quantidade();
+				var quantidade = kitLivro.getQuantidadeDisponivel() - dadosKitLivro.quantidadeSolicitada();
 				kitLivroService.atualizarQuantidade(quantidade);
 			}
 
-			pedidoRepository.savePedidoKitLivro(dadosKitLivro.quantidade(), pedido.getId(), kitLivro.getId());
+			var pedidoKitLivro = new PedidoKitLivro(
+					null,
+					pedido,
+					kitLivro,
+					dadosKitLivro.quantidadeSolicitada(),
+					dadosKitLivro.valorUnitario()
+			);
+			pedidoKitLivroList.add(pedidoKitLivro);
 		}
+
+		return pedidoKitLivroList;
 	}
 
 	private void verificarNecessidadeCadastroListaPendencia(Pedido pedido) {

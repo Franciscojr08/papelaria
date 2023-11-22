@@ -4,7 +4,6 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
-import papelaria.ideal.api.livroKitLivro.DadosCadastroPedidoPedenciaLivroKitLivro;
 import papelaria.ideal.api.utils.FormaPagamentoEnum;
 
 import java.time.LocalDateTime;
@@ -25,7 +24,7 @@ public record DadosCadastroPedido(
 		LocalDateTime dataEntrega,
 		@NotNull(message = "{clientePedido.obrigatorio}")
 		Long clienteId,
-		List<DadosCadastroPedidoPedenciaLivroKitLivro> livros,
-		List<DadosCadastroPedidoPedenciaLivroKitLivro> kitLivros
+		List<DadosCadastroPedidoLivroKitLivro> livros,
+		List<DadosCadastroPedidoLivroKitLivro> kitLivros
 ) {
 }

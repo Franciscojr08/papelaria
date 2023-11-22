@@ -1,13 +1,13 @@
 package papelaria.ideal.api.kitLivro;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import papelaria.ideal.api.pedido.kitLivro.PedidoKitLivro;
+
+import java.util.List;
 
 @Data
 @Entity(name = "kit_livro")
@@ -19,6 +19,10 @@ public class KitLivro {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-	private boolean ativo;
-	private int quantidade;
+
+	@OneToMany(mappedBy = "kitLivro", fetch = FetchType.LAZY)
+	private List<PedidoKitLivro> pedidoKitLivro;
+
+	private Boolean ativo;
+	private Long quantidadeDisponivel;
 }

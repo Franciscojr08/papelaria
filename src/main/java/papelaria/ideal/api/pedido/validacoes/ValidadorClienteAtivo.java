@@ -17,7 +17,7 @@ public class ValidadorClienteAtivo implements ValidadorPedidoInterface {
 			throw new ValidacaoException("O cliente informado é inválido ou não está cadastrado.");
 		}
 
-		if (!clienteRepository.getReferenceById(dados.clienteId()).isAtivo()) {
+		if (!clienteRepository.getReferenceById(dados.clienteId()).getAtivo()) {
 			throw new ValidacaoException("O pedido não pôde ser cadastrado pois o cliente informado está inativo!");
 		}
 	}

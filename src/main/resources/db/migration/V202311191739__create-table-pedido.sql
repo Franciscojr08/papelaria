@@ -1,23 +1,23 @@
 CREATE TABLE kit_livro
 (
-    id         SMALLINT UNSIGNED PRIMARY KEY auto_increment,
-    nome       VARCHAR(50)       not null,
-    descricao  VARCHAR(255)      null,
-    valor      DECIMAL(10, 2)    not null,
-    quantidade SMALLINT UNSIGNED not null,
-    ativo      boolean           not null default true
+    id                    SMALLINT UNSIGNED PRIMARY KEY auto_increment,
+    nome                  VARCHAR(50)       not null,
+    descricao             VARCHAR(255)      null,
+    valor                 DECIMAL(10, 2)    not null,
+    quantidade_disponivel SMALLINT UNSIGNED not null,
+    ativo                 boolean           not null default true
 );
 
 CREATE TABLE livro
 (
-    id            SMALLINT UNSIGNED PRIMARY KEY auto_increment,
-    identificador VARCHAR(50) UNIQUE not null,
-    nome          VARCHAR(100)       not null,
-    uso_interno   BOOLEAN            not null,
-    valor         DECIMAL(10, 2)     not null,
-    quantidade    SMALLINT UNSIGNED  not null,
-    serie_id      SMALLINT UNSIGNED  null,
-    ativo         boolean            not null default true
+    id                    SMALLINT UNSIGNED PRIMARY KEY auto_increment,
+    identificador         VARCHAR(50) UNIQUE not null,
+    nome                  VARCHAR(100)       not null,
+    uso_interno           BOOLEAN            not null,
+    valor                 DECIMAL(10, 2)     not null,
+    quantidade_disponivel SMALLINT UNSIGNED  not null,
+    serie_id              SMALLINT UNSIGNED  null,
+    ativo                 boolean            not null default true
 );
 
 CREATE TABLE cliente
@@ -54,10 +54,11 @@ alter table pedido
 
 CREATE TABLE pedido_livro
 (
-    id         SMALLINT UNSIGNED PRIMARY KEY auto_increment,
-    quantidade int               not null,
-    pedido_id  SMALLINT UNSIGNED not null,
-    livro_id   SMALLINT UNSIGNED not null
+    id             SMALLINT UNSIGNED PRIMARY KEY auto_increment,
+    quantidade     int               not null,
+    valor_unitario decimal(10, 2)    not null,
+    pedido_id      SMALLINT UNSIGNED not null,
+    livro_id       SMALLINT UNSIGNED not null
 );
 
 alter table pedido_livro
@@ -67,10 +68,11 @@ alter table pedido_livro
 
 CREATE TABLE pedido_kit_livro
 (
-    id          SMALLINT UNSIGNED PRIMARY KEY auto_increment,
-    quantidade  int               not null,
-    pedido_id   SMALLINT UNSIGNED not null,
-    kitlivro_id SMALLINT UNSIGNED not null
+    id             SMALLINT UNSIGNED PRIMARY KEY auto_increment,
+    quantidade     int               not null,
+    valor_unitario decimal(10, 2)    not null,
+    pedido_id      SMALLINT UNSIGNED not null,
+    kitlivro_id    SMALLINT UNSIGNED not null
 );
 
 alter table pedido_kit_livro

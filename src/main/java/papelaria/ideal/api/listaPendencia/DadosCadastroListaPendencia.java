@@ -3,7 +3,6 @@ package papelaria.ideal.api.listaPendencia;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.NotNull;
-import papelaria.ideal.api.livroKitLivro.DadosCadastroPedidoPedenciaLivroKitLivro;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -22,8 +21,8 @@ public record DadosCadastroListaPendencia(
 		@NotNull
 		boolean entregue,
 
-		List<DadosCadastroPedidoPedenciaLivroKitLivro> livros,
-		List<DadosCadastroPedidoPedenciaLivroKitLivro> kitLivros
+		List<DadosCadastroPendenciaLivroKitLivro> livros,
+		List<DadosCadastroPendenciaLivroKitLivro> kitLivros
 ) {
 
 }

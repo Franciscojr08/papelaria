@@ -1,4 +1,4 @@
-package papelaria.ideal.api.livroKitLivro;
+package papelaria.ideal.api.utils;
 
 public interface LivroKitLivroServiceInterface {
 
