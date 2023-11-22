@@ -27,5 +27,6 @@ public class KitLivro {
 	private List<ListaPendenciaKitLivro> listaPendenciaKitLivro;
 
 	private Boolean ativo;
+	private String nome;
 	private Long quantidadeDisponivel;
 }

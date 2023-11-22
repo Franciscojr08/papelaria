@@ -28,5 +28,7 @@ public class Livro {
 	private List<ListaPendenciaLivro> listaPendenciaLivro;
 
 	private Boolean ativo;
+	private String identificador;
+	private String nome;
 	private Long quantidadeDisponivel;
 }

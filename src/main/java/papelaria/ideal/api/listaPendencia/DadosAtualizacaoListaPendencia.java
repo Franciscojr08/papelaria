@@ -10,11 +10,6 @@ public record DadosAtualizacaoListaPendencia(
         Long id,
         LocalDateTime dataEntrega,
         SituacaoListaPendenciaEnum situacao,
-
-        boolean entregue,
-
-        List<DadosCadastroLivroKitLivro> livros,
-        List<DadosCadastroLivroKitLivro> kitLivros
-
+        Boolean entregue
 ) {
 }

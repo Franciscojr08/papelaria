@@ -4,8 +4,12 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
+import papelaria.ideal.api.errors.ValidacaoException;
+import papelaria.ideal.api.listaPendencia.listaPendenciaKitLivro.DadosListaPendenciaKitLivro;
 import papelaria.ideal.api.listaPendencia.listaPendenciaKitLivro.ListaPendenciaKitLivro;
+import papelaria.ideal.api.listaPendencia.listaPendenciaLivro.DadosListaPendenciaLivro;
 import papelaria.ideal.api.listaPendencia.listaPendenciaLivro.ListaPendenciaLivro;
+import papelaria.ideal.api.pedido.DadosCadastroPedidoLivroKitLivro;
 import papelaria.ideal.api.pedido.Pedido;
 
 import java.time.LocalDateTime;
@@ -18,66 +22,99 @@ import java.util.List;
 @AllArgsConstructor
 @EqualsAndHashCode(of = "id")
 public class ListaPendencia {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "pedido_id")
     private Pedido pedido;
 
-    private LocalDateTime dataCadastro;
-    private LocalDateTime dataEntrega;
-    private SituacaoListaPendenciaEnum situacao;
-    private boolean entregue;
-
     @Cascade({CascadeType.ALL})
-    @OneToMany(mappedBy = "lista_pendencia", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "listaPendencia", fetch = FetchType.LAZY)
     private List<ListaPendenciaKitLivro> listaPendenciaKitLivro = new ArrayList<>();;
 
     @Cascade({CascadeType.ALL})
-    @OneToMany(mappedBy = "lista_pendencia", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "listaPendencia", fetch = FetchType.LAZY)
     private List<ListaPendenciaLivro> listaPendenciaLivro = new ArrayList<>();;
 
-    public ListaPendencia(DadosCadastroListaPendencia dados){
-        this.dataEntrega = dados.dataEntrega();
-        this.dataCadastro = dados.dataCadastro();
-        this.situacao = dados.situacao();
-    }
+    private LocalDateTime dataCadastro;
+    private LocalDateTime dataEntrega;
+    private SituacaoListaPendenciaEnum situacao;
+    private Boolean entregue;
 
-    public ListaPendencia(Long aLong, LocalDateTime localDateTime, LocalDateTime localDateTime1, SituacaoListaPendenciaEnum situacao, boolean entregue, List<DadosCadastroPendenciaLivroKitLivro> livros) {
+    public ListaPendencia(
+            Pedido pedido,
+            LocalDateTime dataCadastro,
+            LocalDateTime dataEntrega,
+            SituacaoListaPendenciaEnum situacao,
+            Boolean entregue
+    ) {
+        this.pedido = pedido;
+        this.dataCadastro = dataCadastro;
+        this.dataEntrega = dataEntrega;
+        this.situacao = situacao;
+        this.entregue = entregue;
     }
-
-    public ListaPendencia(Long aLong, LocalDateTime localDateTime, LocalDateTime localDateTime1, SituacaoListaPendenciaEnum situacao, boolean entregue) {
-    }
-
 
     public void atualizarInformacoes(DadosAtualizacaoListaPendencia dados) {
         if (dados.situacao() != null) {
-            this.situacao = SituacaoListaPendenciaEnum.valueOf(String.valueOf(dados.situacao()));
+            this.situacao = dados.situacao();
         }
+
         if (dados.dataEntrega() != null) {
+            if (this.dataEntrega.isBefore(this.pedido.getDataPedido())) {
+                throw new ValidacaoException("A data de entrega não pode ser inferior a data do pedido.");
+            }
+
             this.dataEntrega = dados.dataEntrega();
         }
-//        if (dados.livros() != null) {
-//            this.pendenciaLivro.addAll(dados.livros());
-//        }
-//        if (dados.kitLivros() != null) {
-//            this.pendenciaKitLivro.addAll(dados.kitLivros());
-//        }
+
         if (dados.entregue()) {
             this.entregue = true;
             this.situacao = SituacaoListaPendenciaEnum.ENTREGUE;
         }
-
-    }
-    public void excluir() {
-        this.entregue = true;
     }
 
+    public List<DadosListaPendenciaLivro> getDadosListaPendenciaLivro() {
+        if (this.listaPendenciaLivro == null) {
+            return new ArrayList<>();
+        }
 
-//    public List<ListaPendencia> listar(){
-//
-//        ListaPendencia pendencia = new ListaPendencia( id, Cliente cliente, int data_cadastro, int data_entrega, String situacao, Produto produto);
-//    }
+        List<DadosListaPendenciaLivro> listaPendenciaLivroList = new ArrayList<>();
+
+        for (ListaPendenciaLivro listaPendenciaLivro : this.listaPendenciaLivro) {
+            var dadosListaPendenciaLivro = new DadosListaPendenciaLivro(
+                    listaPendenciaLivro.getLivro().getIdentificador(),
+                    listaPendenciaLivro.getLivro().getNome(),
+                    listaPendenciaLivro.getQuantidade()
+            );
+
+            listaPendenciaLivroList.add(dadosListaPendenciaLivro);
+        }
+
+        return listaPendenciaLivroList;
+    }
+
+    public List<DadosListaPendenciaKitLivro> getDadosListaPendenciaKitLivro() {
+        if (this.listaPendenciaKitLivro == null) {
+            return new ArrayList<>();
+        }
+
+        List<DadosListaPendenciaKitLivro> listaPendenciaKitLivroList = new ArrayList<>();
+
+        for (ListaPendenciaKitLivro listaPendenciaKitLivro : this.listaPendenciaKitLivro) {
+            var dadosListaPendenciaKitLivro = new DadosListaPendenciaKitLivro(
+                    listaPendenciaKitLivro.getKitLivro().getId(),
+                    listaPendenciaKitLivro.getKitLivro().getNome(),
+                    listaPendenciaKitLivro.getQuantidade()
+            );
+
+            listaPendenciaKitLivroList.add(dadosListaPendenciaKitLivro);
+        }
+
+        return listaPendenciaKitLivroList;
+    }
 }
 

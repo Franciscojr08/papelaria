@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 import papelaria.ideal.api.kitLivro.KitLivro;
 import papelaria.ideal.api.listaPendencia.ListaPendencia;
 
-
 @Data
 @Entity(name = "pendencia_kit_livro")
 @AllArgsConstructor

@@ -9,18 +9,15 @@ import java.util.List;
 
 public record DadosCadastroListaPendencia(
         @NotNull
-        Long idPedido,
+        Long pedidoId,
         @NotNull
         LocalDateTime dataCadastro,
-
         LocalDateTime dataEntrega,
-
-        @NotNull @Enumerated(EnumType.STRING)
-        SituacaoListaPendenciaEnum situacao,
-
         @NotNull
-        boolean entregue,
-
+        @Enumerated(EnumType.STRING)
+        SituacaoListaPendenciaEnum situacao,
+        @NotNull
+        Boolean entregue,
         List<DadosCadastroPendenciaLivroKitLivro> livros,
         List<DadosCadastroPendenciaLivroKitLivro> kitLivros
 

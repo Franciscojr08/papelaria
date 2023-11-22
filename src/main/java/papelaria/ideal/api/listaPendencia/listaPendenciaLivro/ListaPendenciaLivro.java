@@ -24,7 +24,7 @@ public class ListaPendenciaLivro {
 
     @ManyToOne
     @JoinColumn(name = "livro_id")
-    private Livro Livro;
+    private Livro livro;
 
     private Long quantidade;
 }
