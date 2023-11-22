@@ -74,7 +74,7 @@ public class ListaPendenciaService {
                     null,
                     listaPendencia,
                     livro,
-                    dadosLivro.quantidadeSolicitada()
+                    dadosLivro.quantidade()
             );
             listaPendenciaLivroList.add(listaPendenciaLivro);
         }
@@ -93,7 +93,7 @@ public class ListaPendenciaService {
                     null,
                     listaPendencia,
                     kitLivro,
-                    dadosKitLivro.quantidadeSolicitada()
+                    dadosKitLivro.quantidade()
             );
             listaPendenciaKitLivroList.add(listaPendenciaKitLivro);
         }
