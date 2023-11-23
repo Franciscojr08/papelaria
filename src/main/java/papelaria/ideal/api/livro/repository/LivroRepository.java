@@ -12,6 +12,5 @@ public interface LivroRepository extends JpaRepository<Livro, Long> {
 
     List<Livro> findByAtivoTrue();
 
-    // Aqui você pode adicionar outros métodos de consulta, se necessário
 }
 

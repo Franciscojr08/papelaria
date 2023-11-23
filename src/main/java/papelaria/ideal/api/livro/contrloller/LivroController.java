@@ -38,12 +38,29 @@ public class LivroController {
         livroService.atualizarNomeLivro(id, novoNome);
     }
 
-    // Demais métodos para atualizar outros atributos de livro
-    // ...
+    @PutMapping("/{id}/isbn")
+    public void atualizarIsbnLivro(@PathVariable Long id, @RequestParam String novoIsbn) {
+        livroService.atualizarIsbnLivro(id, novoIsbn);
+    }
 
-    @DeleteMapping("/{id}")
-    public void deletarLivro(@PathVariable Long id) {
-        livroService.excluirLivro(id);
+    @PutMapping("/{id}/valor")
+    public void atualizarValorLivro(@PathVariable Long id, @RequestParam Float novoValor) {
+        livroService.atualizarValorLivro(id, novoValor);
+    }
+
+    @PutMapping("/{id}/usoInterno")
+    public void atualizarUsoInternoLivro(@PathVariable Long id, @RequestParam Boolean novoUsoInterno) {
+        livroService.atualizarUsoInternoLivro(id, novoUsoInterno);
+    }
+
+    @PutMapping("/{id}/quantidade")
+    public void atualizarQuantidadeLivro(@PathVariable Long id, @RequestParam Integer novaQuantidade) {
+        livroService.atualizarQuantidadeLivro(id, novaQuantidade);
+    }
+
+    @PutMapping("/{id}/ativo")
+    public void atualizarAtivoLivro(@PathVariable Long id, @RequestParam Boolean novoStatus) {
+        livroService.atualizarAtivoLivro(id, novoStatus);
+
     }
 }
-
