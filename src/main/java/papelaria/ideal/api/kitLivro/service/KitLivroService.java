@@ -25,7 +25,7 @@ public class KitLivroService {
                 .collect(Collectors.toList());
     }
 
-    public void excluirKitLivro(Long kitLivroId) {
+    public void desativarKitLivro(Long kitLivroId) {
         Optional<KitLivro> kitLivroOpt = kitLivroRepository.findById(kitLivroId);
         kitLivroOpt.ifPresent(kitLivro -> {
             kitLivro.setAtivo(false);

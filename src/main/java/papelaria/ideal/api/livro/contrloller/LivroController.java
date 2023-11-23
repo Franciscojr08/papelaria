@@ -61,6 +61,11 @@ public class LivroController {
     @PutMapping("/{id}/ativo")
     public void atualizarAtivoLivro(@PathVariable Long id, @RequestParam Boolean novoStatus) {
         livroService.atualizarAtivoLivro(id, novoStatus);
-
     }
+
+    @PutMapping("/{id}/desativar")
+    public void desativarLivro(@PathVariable Long id) {
+        livroService.desativarLivro(id);
+    }
+
 }

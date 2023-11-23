@@ -34,7 +34,7 @@ public class LivroService {
         });
     }
 
-    public void excluirLivro(Long livroId) {
+    public void desativarLivro(Long livroId) {
         Optional<Livro> livroOpt = livroRepository.findById(livroId);
         livroOpt.ifPresent(livro -> {
             livro.setAtivo(false);
