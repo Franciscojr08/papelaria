@@ -30,6 +30,7 @@ public class Cliente {
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Aluno aluno;
+    private CharSequence alunos;
 
 
     public void deletar(ClienteRepository clienteRepository, AlunoRepository alunoRepository) {
@@ -38,5 +39,13 @@ public class Cliente {
         }
 
         clienteRepository.delete(this);
+    }
+
+    public CharSequence getAlunos() {
+        return alunos;
+    }
+
+    public void setAlunos(CharSequence alunos) {
+        this.alunos = alunos;
     }
 }
