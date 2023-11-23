@@ -1,4 +1,4 @@
-package endereco;
+package papelaria.ideal.api.endereco;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -45,6 +45,5 @@ public class Endereco {
         if (endereco.estado() != null) {
             this.estado = endereco.estado();
         }
-
     }
 }

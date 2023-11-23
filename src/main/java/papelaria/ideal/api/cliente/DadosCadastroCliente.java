@@ -1,6 +1,6 @@
-package cliente;
+package papelaria.ideal.api.cliente;
 
-import endereco.DadosEndereco;
+import papelaria.ideal.api.endereco.DadosEndereco;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -10,10 +10,16 @@ public record DadosCadastroCliente(
         @NotBlank
         String nome,
         @NotBlank
-        String telefone,
-        @NotBlank
         @Pattern(regexp = "\\d{3}\\.\\d{3}\\.\\d{3}\\-\\d{2}")
         String cpf,
-        @NotNull @Valid DadosEndereco endereco) {
+        @NotBlank
+        String telefone,
+        @NotBlank
+        String email,
+        @NotNull
+        @Valid
+        DadosEndereco endereco,
+        Boolean responsavelAluno
+) {
 }
 

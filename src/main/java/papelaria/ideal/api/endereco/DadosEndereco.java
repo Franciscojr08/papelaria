@@ -1,4 +1,4 @@
-package endereco;
+package papelaria.ideal.api.endereco;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
