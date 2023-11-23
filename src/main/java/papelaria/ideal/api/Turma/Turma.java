@@ -10,7 +10,7 @@ import papelaria.ideal.api.Serie.Serie;
 import java.time.LocalDateTime;
 
 @Data
-@Entity(name = "serie")
+@Entity(name = "turma")
 @AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode(of = "id")

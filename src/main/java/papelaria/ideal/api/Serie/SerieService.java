@@ -2,6 +2,7 @@ package papelaria.ideal.api.Serie;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import papelaria.ideal.api.errors.ValidacaoException;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -13,8 +14,8 @@ public class SerieService {
 	private SerieRepository serieRepository;
 
 	public void cadastrar(DadosCadastroSerie dados) {
-		if (serieRepository.existsByNome(String.valueOf(dados.nome()))) {
-			throw new RuntimeException("Já existe uma série cadastrada com esse nome.");
+		if (serieRepository.existsByNome(dados.nome())) {
+			throw new ValidacaoException("Já existe uma série cadastrada com esse nome.");
 		}
 
 		cadastrarSerie(dados);
@@ -31,7 +32,7 @@ public class SerieService {
 
 	public void atualizarInformacoes(Serie serie, DadosAtualizacaoSerie dados) {
 		if (!serie.getNome().equals(dados.nome()) && serieRepository.existsByNome(String.valueOf(dados.nome()))) {
-			throw new RuntimeException("Já existe uma série cadastrada com esse nome.");
+			throw new ValidacaoException("Já existe uma série cadastrada com esse nome.");
 		}
 
 		if (dados.nome() != null) {

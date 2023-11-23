@@ -4,6 +4,6 @@ import jakarta.validation.constraints.NotBlank;
 
 public record DadosCadastroSerie(
 		@NotBlank
-		Serie nome
+		String nome
 ) {
 }

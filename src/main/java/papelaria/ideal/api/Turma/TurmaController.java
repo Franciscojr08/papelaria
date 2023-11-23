@@ -43,7 +43,7 @@ public class TurmaController {
 		return ResponseEntity.ok().body(new DadosTurma(turma));
 	}
 
-	@PutMapping("/{id}")
+	@PutMapping
 	@Transactional
 	public ResponseEntity<DadosTurma> atualizar(@RequestBody @Valid DadosAtualizacaoTurma dados) {
 		var turma = turmaRepository.getReferenceById(dados.id());

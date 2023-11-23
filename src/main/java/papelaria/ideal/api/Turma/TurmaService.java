@@ -3,6 +3,7 @@ package papelaria.ideal.api.Turma;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import papelaria.ideal.api.Serie.SerieRepository;
+import papelaria.ideal.api.errors.ValidacaoException;
 
 import java.time.LocalDateTime;
 
@@ -21,13 +22,13 @@ public class TurmaService {
 
 	private void validarIntegridade(String nomeTurma, Long serieId) {
 		if (!serieRepository.existsById(serieId)) {
-			throw new RuntimeException(
+			throw new ValidacaoException(
 					"Não foi possível cadastrar a turma. A série informada é inválida ou não esta cadastrada."
 			);
 		}
 
 		if (turmaRepository.existsByNomeAndSerieId(nomeTurma,serieId)) {
-			throw new RuntimeException(
+			throw new ValidacaoException(
 					"Não foi possível cadastrar a turma. Já existe uma turma para essa série com esse mesmo nome."
 			);
 		}
@@ -46,7 +47,7 @@ public class TurmaService {
 
 	public void atualizarInformacoes(Turma turma, DadosAtualizacaoTurma dados) {
 		if (turma.getNome().equals(dados.nome()) && turmaRepository.existsByNome(dados.nome())) {
-			throw new RuntimeException(
+			throw new ValidacaoException(
 					"Não foi possível atualizar a turma. Já existe uma turma com esse mesmo nome."
 			);
 		}
