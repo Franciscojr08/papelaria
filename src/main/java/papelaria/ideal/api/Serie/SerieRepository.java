@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface SerieRepository extends JpaRepository<Serie,Long> {
 
-	boolean existsByNome(String nome);
+	Boolean existsByNome(String nome);
 
 	Page<Serie> findAllByAtivoTrue(Pageable page);
 }

@@ -12,4 +12,17 @@ public record DadosKitLivro(
 		LocalDateTime dataAtualizacao,
 		Boolean Ativo
 ) {
+
+	public DadosKitLivro(KitLivro kitLivro) {
+		this(
+				kitLivro.getId(),
+				kitLivro.getNome(),
+				kitLivro.getDescricao(),
+				kitLivro.getValor(),
+				kitLivro.getQuantidadeDisponivel(),
+				kitLivro.getDataCadastro(),
+				kitLivro.getDataAtualizacao(),
+				kitLivro.getAtivo()
+		);
+	}
 }

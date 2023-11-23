@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import papelaria.ideal.api.Turma.Turma;
+import papelaria.ideal.api.livro.Livro;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -22,7 +23,10 @@ public class Serie {
 	private Long id;
 
 	@OneToMany(mappedBy = "serie", fetch = FetchType.LAZY)
-	private List<Turma> turma;
+	private List<Turma> turmas;
+
+	@OneToMany(mappedBy = "serie", fetch = FetchType.LAZY)
+	private List<Livro> livros;
 
 	private String nome;
 	private LocalDateTime dataCadastro;

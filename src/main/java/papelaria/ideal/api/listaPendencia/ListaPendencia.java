@@ -91,6 +91,7 @@ public class ListaPendencia {
 
         for (ListaPendenciaLivro listaPendenciaLivro : this.listaPendenciaLivro) {
             var dadosListaPendenciaLivro = new DadosListaPendenciaLivro(
+                    listaPendenciaLivro.getLivro().getId(),
                     listaPendenciaLivro.getLivro().getIdentificador(),
                     listaPendenciaLivro.getLivro().getNome(),
                     listaPendenciaLivro.getQuantidade()

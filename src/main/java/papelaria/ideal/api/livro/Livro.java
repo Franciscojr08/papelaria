@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import papelaria.ideal.api.Serie.Serie;
 import papelaria.ideal.api.listaPendencia.listaPendenciaLivro.ListaPendenciaLivro;
 import papelaria.ideal.api.pedido.livro.PedidoLivro;
 
@@ -27,6 +28,10 @@ public class Livro {
 
 	@OneToMany(mappedBy = "livro", fetch = FetchType.LAZY)
 	private List<ListaPendenciaLivro> listaPendenciaLivro;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "serie_id")
+	private Serie serie;
 
 	private String identificador;
 	private String nome;

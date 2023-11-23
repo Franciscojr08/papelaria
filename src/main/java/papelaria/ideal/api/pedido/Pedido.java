@@ -98,6 +98,7 @@ public class Pedido {
 
 		for (PedidoLivro pedidoLivro : this.pedidoLivro) {
 			var dadosPedidoLivro = new DadosPedidoLivro(
+					pedidoLivro.getId(),
 					pedidoLivro.getLivro().getIdentificador(),
 					pedidoLivro.getLivro().getNome(),
 					pedidoLivro.getQuantidade(),

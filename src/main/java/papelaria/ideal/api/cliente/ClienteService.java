@@ -8,6 +8,7 @@ import papelaria.ideal.api.endereco.Endereco;
 import papelaria.ideal.api.errors.ValidacaoException;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Service
 public class ClienteService {
@@ -42,7 +43,9 @@ public class ClienteService {
 
     public void atualizarInformacoes(Cliente cliente, DadosAtualizacaoCliente dados) {
         if (dados.cpf() != null) {
-            if (!cliente.getCpf().equals(dados.cpf().replaceAll("[.-]", "")) && clienteRepository.existsByCpf(dados.cpf())) {
+            if (!Objects.equals(cliente.getCpf(), dados.cpf().replaceAll("[.-]", "")) &&
+                    clienteRepository.existsByCpf(dados.cpf())
+            ) {
                 throw new ValidacaoException("Não foi possível atualizar o cliente. O CPF informado já está cadastrado.");
             }
 

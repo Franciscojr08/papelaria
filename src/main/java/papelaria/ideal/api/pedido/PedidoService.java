@@ -173,7 +173,7 @@ public class PedidoService {
 				pedido.getId(),
 				pedido.getDataPedido(),
 				null,
-				SituacaoListaPendenciaEnum.CANCELADA,
+				SituacaoListaPendenciaEnum.PENDENTE,
 				false,
 				listaPendenciaLivro,
 				listaPendenciaKitLivro

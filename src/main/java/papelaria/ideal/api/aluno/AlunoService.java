@@ -7,6 +7,7 @@ import papelaria.ideal.api.cliente.ClienteRepository;
 import papelaria.ideal.api.errors.ValidacaoException;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Service
 public class AlunoService {
@@ -99,7 +100,7 @@ public class AlunoService {
 		}
 
 		if (dados.matricula() != null &&
-				!aluno.getMatricula().equals(dados.matricula()) &&
+				!Objects.equals(aluno.getMatricula(), dados.matricula()) &&
 				alunoRepository.existsByMatricula(dados.matricula())
 		) {
 			throw new ValidacaoException(
@@ -108,7 +109,7 @@ public class AlunoService {
 		}
 
 		if (dados.rg() != null &&
-				!aluno.getRg().equals(dados.rg()) &&
+				!Objects.equals(aluno.getRg(), dados.rg()) &&
 				alunoRepository.existsByRg(dados.rg())
 		) {
 			throw new ValidacaoException(
@@ -117,8 +118,8 @@ public class AlunoService {
 		}
 
 		if (dados.cpf() != null &&
-				!aluno.getCpf().equals(dados.cpf())
-				&& alunoRepository.existsByCpf(dados.cpf())
+				!Objects.equals(aluno.getCpf(), dados.cpf()) &&
+				alunoRepository.existsByCpf(dados.cpf())
 		) {
 			throw new ValidacaoException(
 					"Não foi possível atualizar o aluno. O CPF informado já está sendo utilizado por outro aluno."
