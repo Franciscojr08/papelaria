@@ -1,41 +1,66 @@
+package papelaria.ideal.api.Turma;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import papelaria.ideal.api.Turma.DadosCadastroTurma;
+import papelaria.ideal.api.Serie.SerieRepository;
 
-import java.util.List;
-import java.util.Optional;
+import java.time.LocalDateTime;
 
 @Service
 public class TurmaService {
 
-    @Autowired
-    private TurmaRepository turmaRepository;
+	@Autowired
+	private TurmaRepository turmaRepository;
+	@Autowired
+	private SerieRepository serieRepository;
 
-    @Autowired
-    private SerieRepository serieRepository;
+	public void cadastrar(DadosCadastroTurma dados) {
+		validarIntegridade(dados.nome(), dados.serieId());
+		cadastrarTurma(dados);
+	}
 
-    @Transactional
-    public Turma cadastrarTurma(DadosCadastroTurma dadosCadastroTurma) {
-        Long serieId = DadosCadastroTurma.getSerieId();
-        Serie serieAssociada = serieRepository.findById(serieId)
-                .orElseThrow(() -> new IllegalArgumentException("Série inválida para a turma."));
+	private void validarIntegridade(String nomeTurma, Long serieId) {
+		if (!serieRepository.existsById(serieId)) {
+			throw new RuntimeException(
+					"Não foi possível cadastrar a turma. A série informada é inválida ou não esta cadastrada."
+			);
+		}
 
+		if (turmaRepository.existsByNomeAndSerieId(nomeTurma,serieId)) {
+			throw new RuntimeException(
+					"Não foi possível cadastrar a turma. Já existe uma turma para essa série com esse mesmo nome."
+			);
+		}
+	}
 
-        Turma turma = new Turma(DadosCadastroTurma.getNome());
-        turma.setSerie(serieAssociada);
+	private void cadastrarTurma(DadosCadastroTurma dados) {
+		var serie = serieRepository.getReferenceById(dados.serieId());
+		var turma = new  Turma();
+		turma.setNome(dados.nome());
+		turma.setSerie(serie);
+		turma.setDataCadastro(LocalDateTime.now());
+		turma.setAtivo(true);
 
-        return turmaRepository.save(turma);
-    }
+		turmaRepository.save(turma);
+	}
 
-    public Turma atualizarTurma(Long id, Turma turma) {
-        if (turmaRepository.existsById(id)) {
-            turma.setId(id);
-            return turmaRepository.save(turma);
-        }
-        return null;
-    }
+	public void atualizarInformacoes(Turma turma, DadosAtualizacaoTurma dados) {
+		if (turma.getNome().equals(dados.nome()) && turmaRepository.existsByNome(dados.nome())) {
+			throw new RuntimeException(
+					"Não foi possível atualizar a turma. Já existe uma turma com esse mesmo nome."
+			);
+		}
 
-    public void deletarTurma(Long id) {
-        turmaRepository.deleteById(id);
-    }
+		if (dados.nome() != null) {
+			turma.setNome(dados.nome());
+		}
+
+		if (dados.ativo() != null) {
+			turma.setAtivo(dados.ativo());
+		}
+
+		if (dados.nome() != null || dados.ativo() != null) {
+			turma.setDataAtualizacao(LocalDateTime.now());
+		}
+	}
 }

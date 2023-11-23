@@ -1,54 +1,49 @@
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.Optional;
+package papelaria.ideal.api.Serie;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import papelaria.ideal.api.Serie.DadosCadastrarSerie;
 
-import javax.transaction.Transactional;
+import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Service
 public class SerieService {
 
-    @Autowired
-    private SerieRepository serieRepository;
+	@Autowired
+	private SerieRepository serieRepository;
 
-    @Transactional
-    public Serie cadastrarSerie(DadosCadastrarSerie dadosCadastrarSerie) {
-        // Verificar se já existe uma série com o mesmo nome
-        String nomeSerie = dadosCadastrarSerie.getNome();
-        if (serieRepository.existsByNome(nomeSerie)) {
-            throw new IllegalArgumentException("Já existe uma série com o mesmo nome.");
-        }
+	public void cadastrar(DadosCadastroSerie dados) {
+		if (serieRepository.existsByNome(String.valueOf(dados.nome()))) {
+			throw new RuntimeException("Já existe uma série cadastrada com esse nome.");
+		}
 
-        // Criar a série a partir do record
-        Serie serie = new Serie(dadosCadastrarSerie.getNome());
+		cadastrarSerie(dados);
+	}
 
-        return serieRepository.save(serie);
-    }
+	private void cadastrarSerie(DadosCadastroSerie dados) {
+		var serie = new Serie();
+		serie.setNome(String.valueOf(dados.nome()));
+		serie.setAtivo(true);
+		serie.setDataCadastro(LocalDateTime.now());
 
-    public List<Serie> listarSeries() {
-        return serieRepository.findAll();
-    }
+		serieRepository.save(serie);
+	}
 
-    public Optional<Serie> listarSeriePorId(Long id) {
-        return serieRepository.findById(id);
-    }
+	public void atualizarInformacoes(Serie serie, DadosAtualizacaoSerie dados) {
+		if (!serie.getNome().equals(dados.nome()) && serieRepository.existsByNome(String.valueOf(dados.nome()))) {
+			throw new RuntimeException("Já existe uma série cadastrada com esse nome.");
+		}
 
-    @Transactional
-    public Serie atualizarSerie(Long id, Serie serie) {
-        if (serieRepository.existsById(id)) {
-            serie.setId(id);
-            return serieRepository.save(serie);
-        }
-        return null;
-    }
+		if (dados.nome() != null) {
+			serie.setNome(dados.nome());
+		}
 
-    public void deletarSerie(Long id) {
-        serieRepository.deleteById(id);
-    }
+		if (dados.ativo() != null) {
+			serie.setAtivo(dados.ativo());
+		}
+
+		if (dados.nome() != null || dados.ativo() != null) {
+			serie.setDataAtualizacao(LocalDateTime.now());
+		}
+	}
 }
-

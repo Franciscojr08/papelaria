@@ -1,50 +1,62 @@
 package papelaria.ideal.api.Serie;
 
+import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import java.util.Optional;
+import java.time.LocalDateTime;
 
 @RestController
-@RequestMapping("/series")
+@RequestMapping("/serie")
 public class SerieController {
 
-    @Autowired
-    private SerieService serieService;
+	@Autowired
+	private SerieService serieService;
+	@Autowired
+	private SerieRepository serieRepository;
 
-    @GetMapping
-    public List<Serie> listarSeries() {
-        return serieService.listarSeries();
-    }
+	@PostMapping
+	@Transactional
+	public ResponseEntity<String> cadastrar(@RequestBody @Valid DadosCadastroSerie dados) {
+		serieService.cadastrar(dados);
 
-    @GetMapping("/{id}")
-    public ResponseEntity<Serie> listarSeriePorId(@PathVariable Long id) {
-        Optional<Serie> serie = serieService.listarSeriePorId(id);
-        return serie.map(value -> new ResponseEntity<>(value, HttpStatus.OK))
-                .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
-    }
+		return ResponseEntity.ok().body("Série cadastrada com sucesso!");
+	}
 
-    @PostMapping
-    public ResponseEntity<Serie> cadastrarSerie(@RequestBody Serie serie) {
-        Serie novaSerie = serieService.cadastrarSerie(serie);
-        return new ResponseEntity<>(novaSerie, HttpStatus.CREATED);
-    }
+	@GetMapping
+	public ResponseEntity<Page<DadosSerie>> listar(Pageable paginacao) {
+		var page = serieRepository.findAllByAtivoTrue(paginacao).map(DadosSerie::new);
 
-    @PutMapping("/{id}")
-    public ResponseEntity<Serie> atualizarSerie(@PathVariable Long id, @RequestBody Serie serie) {
-        Serie serieAtualizada = serieService.atualizarSerie(id, serie);
-        return serieAtualizada != null ?
-                new ResponseEntity<>(serieAtualizada, HttpStatus.OK) :
-                new ResponseEntity<>(HttpStatus.NOT_FOUND);
-    }
+		return ResponseEntity.ok().body(page);
+	}
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletarSerie(@PathVariable Long id) {
-        serieService.deletarSerie(id);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-    }
+	@GetMapping("/{id}")
+	public ResponseEntity<DadosSerie> detalhar(@PathVariable Long id) {
+		var serie = serieRepository.getReferenceById(id);
+
+		return ResponseEntity.ok().body(new DadosSerie(serie));
+	}
+
+	@PutMapping
+	@Transactional
+	public ResponseEntity<DadosSerie> atualizar(@RequestBody @Valid DadosAtualizacaoSerie dados) {
+		var serie = serieRepository.getReferenceById(dados.id());
+		serieService.atualizarInformacoes(serie,dados);
+
+		return ResponseEntity.ok().body(new DadosSerie(serie));
+	}
+
+	@DeleteMapping("/{id}")
+	@Transactional
+	public ResponseEntity deletar(@PathVariable Long id) {
+		var serie = serieRepository.getReferenceById(id);
+		serie.setAtivo(false);
+		serie.setDataAtualizacao(LocalDateTime.now());
+
+		return ResponseEntity.noContent().build();
+	}
 }
-

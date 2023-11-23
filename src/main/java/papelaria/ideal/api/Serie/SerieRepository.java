@@ -1,9 +1,12 @@
-package com.api.papelaria.respository;
+package papelaria.ideal.api.Serie;
 
-import com.api.papelaria.models.Turma;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
 
-@Repository
-public interface SerieRepository extends JpaRepository<Serie> {
+public interface SerieRepository extends JpaRepository<Serie,Long> {
+
+	boolean existsByNome(String nome);
+
+	Page<Serie> findAllByAtivoTrue(Pageable page);
 }

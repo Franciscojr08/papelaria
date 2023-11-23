@@ -1,51 +1,31 @@
 package papelaria.ideal.api.Turma;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import papelaria.ideal.api.Serie.Serie;
+
+import java.time.LocalDateTime;
 
 @Data
-@Entity
+@Entity(name = "serie")
+@AllArgsConstructor
+@NoArgsConstructor
+@EqualsAndHashCode(of = "id")
 public class Turma {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
 
-    public Turma() {
-        // Construtor <...>
-    }
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "serie_id")
+	private Serie serie;
 
-    public Turma(String serie, String nome) {
-        this.serie = serie;
-        this.nome = nome;
-    }
-
-    // Getters e setters
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getSerie() {
-        return serie;
-    }
-
-    public void setSerie(String serie) {
-        this.serie = serie;
-    }
-
-    public String getNome() {
-        return nome;
-    }
-
-    public void setNome(String nome) {
-        this.nome = nome;
-    }
+	private String nome;
+	private LocalDateTime dataCadastro;
+	private LocalDateTime dataAtualizacao;
+	private Boolean ativo;
 }
-
