@@ -29,10 +29,10 @@ public class TratarErros {
 		);
 	}
 
-	@ExceptionHandler(Exception.class)
-	public ResponseEntity tratarErro500(Exception exp) {
-		return ResponseEntity.internalServerError().body("Desculpe-me, ocorreu um erro interno no sistema!");
-	}
+//	@ExceptionHandler(Exception.class)
+//	public ResponseEntity tratarErro500(Exception exp) {
+//		return ResponseEntity.internalServerError().body("Desculpe-me, ocorreu um erro interno no sistema!");
+//	}
 
 	@ExceptionHandler(ValidacaoException.class)
 	public ResponseEntity tratarErroRegraDeNegocio(ValidacaoException ex) {

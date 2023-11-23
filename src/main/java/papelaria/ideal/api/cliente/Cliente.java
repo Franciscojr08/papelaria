@@ -1,40 +1,59 @@
 package papelaria.ideal.api.cliente;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import papelaria.ideal.api.aluno.Aluno;
+import papelaria.ideal.api.aluno.DadosClienteAluno;
+import papelaria.ideal.api.endereco.Endereco;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import papelaria.ideal.api.pedido.Pedido;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
 @Entity(name = "cliente")
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 @EqualsAndHashCode(of = "id")
 public class Cliente {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @OneToMany(mappedBy = "cliente", fetch = FetchType.LAZY)
+    private List<Aluno> alunos;
 
 	@OneToMany(mappedBy = "cliente", fetch = FetchType.LAZY)
 	private List<Pedido> pedidos;
 
-	private String nome;
-	private String cpf;
-	private String telefone;
-	private String email;
-	private String cep;
-	private String logradouro;
-	private String bairro;
-	private String cidade;
-	private String estado;
-	private Boolean responsavelAluno;
-	private LocalDateTime dataCadastro;
-	private LocalDateTime dataAtualizacao;
-	private Boolean ativo;
+    private String nome;
+    private String cpf;
+    private String telefone;
+    private String email;
+    private Boolean responsavelAluno;
+    private LocalDateTime dataCadastro;
+    private LocalDateTime dataAtualizacao;
+    private Boolean ativo;
+
+    @Embedded @Valid
+    private Endereco endereco;
+
+    public List<DadosClienteAluno> getDadosClienteAluno() {
+        if (this.alunos == null) {
+            return  new ArrayList<>();
+        }
+
+        List<DadosClienteAluno> dadosClienteAlunoList = new ArrayList<>();
+
+        for (Aluno aluno : this.alunos) {
+            var dadosClienteAluno = new DadosClienteAluno(aluno);
+            dadosClienteAlunoList.add(dadosClienteAluno);
+        }
+
+        return dadosClienteAlunoList;
+    }
 }
