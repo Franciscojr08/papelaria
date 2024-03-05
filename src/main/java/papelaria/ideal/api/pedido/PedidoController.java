@@ -5,8 +5,14 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import papelaria.ideal.api.errors.DadosResponse;
+import papelaria.ideal.api.errors.ValidacaoException;
+import papelaria.ideal.api.pedido.records.*;
+
+import java.time.LocalDateTime;
 
 @RestController
 @RequestMapping("/pedido")
@@ -19,10 +25,16 @@ public class PedidoController {
 
 	@PostMapping
 	@Transactional
-	public ResponseEntity<String> cadastrar(@RequestBody @Valid DadosCadastroPedido dados) {
+	public ResponseEntity<DadosResponse> cadastrar(@RequestBody @Valid DadosCadastroPedido dados) {
 		pedidoService.cadastrar(dados);
+		var dadosResponse = new DadosResponse(
+				LocalDateTime.now(),
+				"Sucesso",
+				HttpStatus.OK.value(),
+				"Pedido cadastrado com sucesso!"
+		);
 
-		return ResponseEntity.ok().body("Pedido cadastrado com sucesso!");
+		return ResponseEntity.ok().body(dadosResponse);
 	}
 
 	@GetMapping
@@ -33,28 +45,42 @@ public class PedidoController {
 	}
 
 	@GetMapping("/{id}")
-	public ResponseEntity<DadosPedido> detalhar(@PathVariable Long id) {
-		var pedido = pedidoRepository.getReferenceById(id);
+	public ResponseEntity<DadosDetalhamentoPedido> detalhar(@PathVariable Long id) {
+		if (!pedidoRepository.existsByIdAndAtivoTrue(id)) {
+			throw new ValidacaoException("Pedido não encontrado ou inativo.");
+		}
 
-		return ResponseEntity.ok().body(new DadosPedido(pedido));
+		return ResponseEntity.ok().body(new DadosDetalhamentoPedido(pedidoRepository.getReferenceById(id)));
 	}
 
 	@PutMapping
 	@Transactional
-	public ResponseEntity<DadosPedido> atualizar(@RequestBody @Valid DadosAtualizacaoPedido dados) {
-		var pedido = pedidoRepository.getReferenceById(dados.id());
-		pedido.atualizarInformacoes(dados);
+	public ResponseEntity<DadosDetalhamentoPedido> atualizar(@RequestBody @Valid DadosAtualizacaoPedido dados) {
+		if (!pedidoRepository.existsByIdAndAtivoTrue(dados.id())) {
+			throw new ValidacaoException("Pedido não encontrado ou inativo.");
+		}
 
-		return ResponseEntity.ok().body(new DadosPedido(pedido));
+		pedidoService.atualizarInformacoes(pedidoRepository.getReferenceById(dados.id()),dados);
+
+		return ResponseEntity.ok().body(new DadosDetalhamentoPedido(pedidoRepository.getReferenceById(dados.id())));
 	}
 
-	@DeleteMapping("/{id}")
+	@DeleteMapping
 	@Transactional
-	public ResponseEntity deletar(@PathVariable Long id) {
-		var pedido = pedidoRepository.getReferenceById(id);
-		pedido.setAtivo(false);
-		pedido.setSituacaoPedido(SituacaoPedidoEnum.CANCELADO);
+	public ResponseEntity<DadosResponse> deletar(@RequestBody @Valid DadosCancelamentoPedido dados) {
+		if (!pedidoRepository.existsByIdAndAtivoTrue(dados.pedidoId())) {
+			throw new ValidacaoException("Pedido não encontrado ou inativo.");
+		}
 
-		return ResponseEntity.noContent().build();
+		pedidoService.cancelar(pedidoRepository.getReferenceById(dados.pedidoId()),dados);
+
+		var dadosResponse = new DadosResponse(
+				LocalDateTime.now(),
+				"Sucesso",
+				HttpStatus.OK.value(),
+				"Pedido cancelado com sucesso!"
+		);
+
+		return ResponseEntity.ok().body(dadosResponse);
 	}
 }

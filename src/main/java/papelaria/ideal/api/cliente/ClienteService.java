@@ -1,11 +1,14 @@
 package papelaria.ideal.api.cliente;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import papelaria.ideal.api.aluno.Aluno;
+import papelaria.ideal.api.cliente.records.DadosAtualizacaoCliente;
+import papelaria.ideal.api.cliente.records.DadosCadastroCliente;
 import papelaria.ideal.api.endereco.Endereco;
 import papelaria.ideal.api.errors.ValidacaoException;
+import papelaria.ideal.api.pedido.Pedido;
+import papelaria.ideal.api.pedido.SituacaoPedidoEnum;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -22,7 +25,7 @@ public class ClienteService {
     }
 
     private void validarIntegridade(String cpf) {
-        if (clienteRepository.existsByCpf(cpf)) {
+        if (clienteRepository.existsByAtivoTrueAndCpf(cpf)) {
             throw new ValidacaoException("Não foi possível cadastrar o cliente. O CPF informado já está cadastrado.");
         }
     }
@@ -44,7 +47,7 @@ public class ClienteService {
     public void atualizarInformacoes(Cliente cliente, DadosAtualizacaoCliente dados) {
         if (dados.cpf() != null) {
             if (!Objects.equals(cliente.getCpf(), dados.cpf().replaceAll("[.-]", "")) &&
-                    clienteRepository.existsByCpf(dados.cpf())
+                    clienteRepository.existsByAtivoTrueAndCpf(dados.cpf())
             ) {
                 throw new ValidacaoException("Não foi possível atualizar o cliente. O CPF informado já está cadastrado.");
             }
@@ -69,6 +72,13 @@ public class ClienteService {
         }
 
         if (dados.responsavelAluno() != null) {
+            if (!dados.responsavelAluno() && cliente.getAlunos().stream().anyMatch(Aluno::getAtivo)) {
+                throw new ValidacaoException(
+                        "Não foi possível atualizar o cliente. O mesmo é responsável por aluno(s), este campo não" +
+                        " pode ser alterado."
+                );
+            }
+
             cliente.setResponsavelAluno(dados.responsavelAluno());
         }
 
@@ -79,6 +89,15 @@ public class ClienteService {
         if (cliente.getAlunos().stream().anyMatch(Aluno::getAtivo)) {
             throw new ValidacaoException(
                     "Não foi possível deletar o cliente, o mesmo é responsável por um ou mais alunos."
+            );
+        }
+
+        if (cliente.getPedidos()
+                .stream()
+                .anyMatch(pedido -> pedido.getSituacaoPedido() == SituacaoPedidoEnum.PENDENTE)
+        ) {
+            throw new ValidacaoException(
+                    "Não foi possível deletar o cliente, o mesmo possui pedidos pendentes."
             );
         }
 

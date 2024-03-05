@@ -4,49 +4,73 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+import papelaria.ideal.api.errors.DadosResponse;
+import papelaria.ideal.api.errors.ValidacaoException;
+import papelaria.ideal.api.listaPendencia.records.DadosAtualizacaoListaPendencia;
+import papelaria.ideal.api.listaPendencia.records.DadosCancelamentoListaPendencia;
+import papelaria.ideal.api.listaPendencia.records.DadosDetalhamentoListaPendencia;
+import papelaria.ideal.api.listaPendencia.records.DadosListagemListaPendencia;
+
+import java.time.LocalDateTime;
 
 @RestController
 @RequestMapping("ListaPendencia")
 public class ListaPendenciaController {
 
     @Autowired
-    private ListaPendenciaRepository repository;
+    private ListaPendenciaRepository listaPendenciaRepository;
+    @Autowired
+    private ListaPendenciaService listaPendenciaService;
 
     @GetMapping
     public ResponseEntity<Page<DadosListagemListaPendencia>> listar(Pageable paginacao) {
-        var page = repository.findAllByAtivoTrue(paginacao).map(DadosListagemListaPendencia::new);
+        var page = listaPendenciaRepository.findAllByAtivoTrue(paginacao).map(DadosListagemListaPendencia::new);
 
         return ResponseEntity.ok(page);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity detalhar(@PathVariable Long id) {
-        var listaPendencia = repository.getReferenceById(id);
+    public ResponseEntity<DadosDetalhamentoListaPendencia> detalhar(@PathVariable Long id) {
+        if (!listaPendenciaRepository.existsByIdAndAtivoTrue(id)) {
+            throw new ValidacaoException("Lista de pendência não encontrada ou inativa.");
+        }
 
-        return ResponseEntity.ok(new DadosDetalhamentoListaPendencia(listaPendencia));
+        return ResponseEntity.ok().body(new DadosDetalhamentoListaPendencia(listaPendenciaRepository.getReferenceById(id)));
     }
 
     @PutMapping
     @Transactional
-    public ResponseEntity atualizar(@RequestBody @Valid DadosAtualizacaoListaPendencia dados) {
-        var listaPendencia = repository.getReferenceById(dados.id());
-        listaPendencia.atualizarInformacoes(dados);
+    public ResponseEntity<DadosDetalhamentoListaPendencia> atualizar(@RequestBody @Valid DadosAtualizacaoListaPendencia dados) {
+        if (!listaPendenciaRepository.existsByIdAndAtivoTrue(dados.id())) {
+            throw new ValidacaoException("Lista de pendência não encontrada ou inativa.");
+        }
 
-        return ResponseEntity.ok(new DadosDetalhamentoListaPendencia(listaPendencia));
+        listaPendenciaService.atualizar(listaPendenciaRepository.getReferenceById(dados.id()),dados);
+
+        return ResponseEntity.ok().body(new DadosDetalhamentoListaPendencia(listaPendenciaRepository.getReferenceById(dados.id())));
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping
     @Transactional
-    public ResponseEntity deletar(@PathVariable Long id) {
-        var listaPendencia = repository.getReferenceById(id);
-        listaPendencia.setAtivo(false);
-        listaPendencia.setEntregue(false);
-        listaPendencia.setSituacao(SituacaoListaPendenciaEnum.CANCELADA);
+    public ResponseEntity<DadosResponse> deletar(@RequestBody @Valid DadosCancelamentoListaPendencia dados) {
+        if (!listaPendenciaRepository.existsByIdAndAtivoTrue(dados.listaPendenciaId())) {
+            throw new ValidacaoException("Lista de pendência não encontrada ou inativa.");
+        }
 
-        return ResponseEntity.noContent().build();
+        listaPendenciaService.cancelar(listaPendenciaRepository.getReferenceById(dados.listaPendenciaId()),dados);
+
+        var dadosResponse = new DadosResponse(
+                LocalDateTime.now(),
+                "Sucesso",
+                HttpStatus.OK.value(),
+                "Lista de pendência cancelada com sucesso!"
+        );
+
+        return ResponseEntity.ok().body(dadosResponse);
     }
 
 }

@@ -8,11 +8,13 @@ import java.util.Optional;
 
 public interface AlunoRepository extends JpaRepository<Aluno, Long> {
 
-    Boolean existsByCpf(String cpf);
+    Boolean existsByCpfAndAtivoTrue(String cpf);
 
-    Boolean existsByRg(String rg);
+    Boolean existsByRgAndAtivoTrue(String rg);
 
-    Boolean existsByMatricula(String matricula);
+    Boolean existsByMatriculaAndAtivoTrue(String matricula);
 
-    public Page<Aluno> findAllByAtivoTrue(Pageable page);
+    Page<Aluno> findAllByAtivoTrue(Pageable page);
+
+    Boolean existsByIdAndAtivoTrue(Long id);
 }

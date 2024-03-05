@@ -4,6 +4,7 @@ public record DadosListaPendenciaLivro(
 		Long id,
 		String identificador,
 		String nome,
-		Long quantidade
+		Long quantidade,
+		Long quantidadeEntregue
 ) {
 }

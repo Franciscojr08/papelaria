@@ -7,8 +7,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface LivroRepository extends JpaRepository<Livro,Long> {
 
 	Boolean existsByIdAndAtivoFalse(Long id);
+	Boolean existsByIdAndAtivoTrue(Long id);
 
-	Boolean existsByIdentificador(String identificador);
+	Boolean existsByAtivoTrueAndIdentificador(String identificador);
 
 	Page<Livro> findAllByAtivoTrue(Pageable page);
 }

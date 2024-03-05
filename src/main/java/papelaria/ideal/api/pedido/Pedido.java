@@ -9,16 +9,24 @@ import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
 import papelaria.ideal.api.cliente.Cliente;
 import papelaria.ideal.api.errors.ValidacaoException;
+import papelaria.ideal.api.kitLivro.KitLivro;
 import papelaria.ideal.api.listaPendencia.ListaPendencia;
+import papelaria.ideal.api.listaPendencia.SituacaoListaPendenciaEnum;
+import papelaria.ideal.api.listaPendencia.listaPendenciaKitLivro.ListaPendenciaKitLivro;
+import papelaria.ideal.api.listaPendencia.listaPendenciaLivro.ListaPendenciaLivro;
+import papelaria.ideal.api.livro.Livro;
 import papelaria.ideal.api.pedido.kitLivro.DadosPedidoKitLivro;
 import papelaria.ideal.api.pedido.kitLivro.PedidoKitLivro;
 import papelaria.ideal.api.pedido.livro.DadosPedidoLivro;
 import papelaria.ideal.api.pedido.livro.PedidoLivro;
+import papelaria.ideal.api.pedido.records.DadosAtualizacaoPedido;
+import papelaria.ideal.api.pedido.records.DadosPedidoLivroKitLivro;
 import papelaria.ideal.api.utils.FormaPagamentoEnum;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Data
 @Entity(name = "pedido")
@@ -62,22 +70,24 @@ public class Pedido {
 
 	public Pedido(
 			LocalDateTime dataPedido,
-			Float valor,
 			Float desconto,
 			FormaPagamentoEnum formaPagamento,
 			SituacaoPedidoEnum situacaoPedido,
-			LocalDateTime dataEntrega,
 			Cliente cliente,
 			Boolean ativo
 	) {
 		this.dataPedido = dataPedido;
-		this.valor = valor;
 		this.desconto = desconto;
 		this.formaPagamento = formaPagamento;
 		this.situacaoPedido = situacaoPedido;
-		this.dataEntrega = dataEntrega;
 		this.cliente = cliente;
 		this.ativo = ativo;
+	}
+
+	public Boolean hasPendenciaAtivaBySituacao(SituacaoListaPendenciaEnum situacao) {
+		return this.listaPendencia != null &&
+				this.listaPendencia.getAtivo() &&
+				this.listaPendencia.getSituacao() == situacao;
 	}
 
 	public Float getValorTotal() {
@@ -102,6 +112,7 @@ public class Pedido {
 					pedidoLivro.getLivro().getIdentificador(),
 					pedidoLivro.getLivro().getNome(),
 					pedidoLivro.getQuantidade(),
+					pedidoLivro.getQuantidadeEntregue(),
 					pedidoLivro.getValorUnitario(),
 					pedidoLivro.getQuantidade() * pedidoLivro.getValorUnitario()
 			);
@@ -124,6 +135,7 @@ public class Pedido {
 					pedidoKitLivro.getKitLivro().getId(),
 					pedidoKitLivro.getKitLivro().getNome(),
 					pedidoKitLivro.getQuantidade(),
+					pedidoKitLivro.getQuantidadeEntregue(),
 					pedidoKitLivro.getValorUnitario(),
 					pedidoKitLivro.getQuantidade() * pedidoKitLivro.getValorUnitario()
 			);
@@ -134,31 +146,101 @@ public class Pedido {
 		return dadosPedidoKitLivroList;
 	}
 
-	public void atualizarInformacoes(DadosAtualizacaoPedido dados) {
-		if (dados.dataPedido() != null) {
-			this.dataPedido = dados.dataPedido();
+	public Boolean todosItensEntregues() {
+		var todosLivrosEntregues = this.pedidoLivro.stream().allMatch(PedidoLivro::todosItensEntregues);
+		var todosKitLivrosEntregues = this.pedidoKitLivro.stream().allMatch(PedidoKitLivro::todosItensEntregues);
+
+		return todosLivrosEntregues && todosKitLivrosEntregues;
+	}
+
+	public Boolean algumItemEntregue() {
+		var livrosEntregues = this.pedidoLivro.stream().mapToLong(PedidoLivro::getQuantidadeEntregue).sum();
+		var kitLivrosEntregues = this.pedidoKitLivro.stream().mapToLong(PedidoKitLivro::getQuantidadeEntregue).sum();
+
+		return (livrosEntregues > 0) || (kitLivrosEntregues > 0);
+	}
+
+	public Boolean todosItensEstaoNaListaPendencia() {
+		var listaPendenciaLivro = this.listaPendencia.getListaPendenciaLivro();
+		var totalLivrosPendencia = listaPendenciaLivro.stream().mapToLong(ListaPendenciaLivro::getQuantidade).sum();
+		var totalLivrosPedido = this.pedidoLivro.stream().mapToLong(PedidoLivro::getQuantidade).sum();
+		var todosLivrosPendentes = (totalLivrosPendencia == totalLivrosPedido);
+
+		var listaPendenciaKitLivro = this.listaPendencia.getListaPendenciaKitLivro();
+		var totalKitLivroPendencia = listaPendenciaKitLivro.stream().mapToLong(ListaPendenciaKitLivro::getQuantidade).sum();
+		var totalKitLivroPedido = this.pedidoKitLivro.stream().mapToLong(PedidoKitLivro::getQuantidade).sum();
+		var todosKitLivrosPendentes = (totalKitLivroPendencia == totalKitLivroPedido);
+
+		return todosLivrosPendentes && todosKitLivrosPendentes;
+	}
+
+	public void atualizarPedidoLivro(DadosPedidoLivroKitLivro pedidoLivroKitLivro, PedidoLivro pedidoLivro) {
+		var quantidadeEntregue = pedidoLivro.getQuantidadeEntregue();
+		var quantidadePendente = pedidoLivro.getQuantidade() - quantidadeEntregue;
+
+		if (pedidoLivroKitLivro.quantidade() > quantidadePendente) {
+			throw new ValidacaoException(
+					"Não foi possível atualizar a lista de pendência. A quantidade de livros" +
+							" informada nesta atualização é maior do que a quantidade pendente."
+			);
 		}
 
-		if (dados.dataEntrega() != null) {
-			if (dados.dataEntrega().isBefore(this.dataPedido)) {
-				throw new ValidacaoException("A data de entrega não pode ser inferior a data do pedido.");
-			}
+		pedidoLivro.setQuantidadeEntregue(quantidadeEntregue + pedidoLivroKitLivro.quantidade());
+	}
 
-			this.dataEntrega = dados.dataEntrega();
+	public void atualizarPedidoKitLivro(DadosPedidoLivroKitLivro pedidoLivroKitLivro, PedidoKitLivro pedidoKitLivro) {
+		var quantidadeEntregue = pedidoKitLivro.getQuantidadeEntregue();
+		var quantidadePendente = pedidoKitLivro.getQuantidade() - quantidadeEntregue;
+
+		if (pedidoLivroKitLivro.quantidade() > quantidadePendente) {
+			throw new ValidacaoException(
+					"Não foi possível atualizar a lista de pendência. A quantidade de kit de livros" +
+							" informada nesta atualização é maior do que a quantidade pendente."
+			);
 		}
 
-		if (dados.desconto() != null) {
-			this.desconto = dados.desconto();
+		pedidoKitLivro.setQuantidadeEntregue(quantidadeEntregue + pedidoLivroKitLivro.quantidade());
+	}
+
+	public Boolean isEntregue() {
+		return this.situacaoPedido == SituacaoPedidoEnum.FINALIZADO;
+	}
+
+	public void removerQuantidadeDeLivroEntregue(Livro livro, Long quantidade) {
+		if (quantidade < 0) {
+			return;
 		}
 
-		if (dados.situacaoPedido() != null) {
-			this.situacaoPedido = dados.situacaoPedido();
+		Optional<PedidoLivro> pedidoLivroOptional = this.pedidoLivro.stream()
+				.filter(pedidoLivro -> pedidoLivro.getLivro().getId() == livro.getId())
+				.findFirst();
+
+		if (pedidoLivroOptional.isPresent()) {
+			var pedidoLivro = pedidoLivroOptional.get();
+			var quantidadeEntregue = pedidoLivro.getQuantidadeEntregue();
+			var quantidadeEntregueAtual = quantidadeEntregue - quantidade;
+			pedidoLivro.setQuantidadeEntregue(quantidadeEntregueAtual);
+		} else {
+			throw new ValidacaoException("O livro informado na devolução não foi encontrado.");
+		}
+	}
+
+	public void removerQuantidadeDeKitLivroEntregue(KitLivro kitLivro, Long quantidade) {
+		if (quantidade < 0) {
+			return;
 		}
 
-		if (dados.formaPagamento() != null) {
-			this.formaPagamento = dados.formaPagamento();
-		}
+		Optional<PedidoKitLivro> pedidoKitLivroOptional = this.pedidoKitLivro.stream()
+				.filter(pedidoKitlivro -> pedidoKitlivro.getKitLivro().getId() == kitLivro.getId())
+				.findFirst();
 
-		this.dataAtualizacao = LocalDateTime.now();
+		if (pedidoKitLivroOptional.isPresent()) {
+			var pedidoKitlivro = pedidoKitLivroOptional.get();
+			var quantidadeEntregue = pedidoKitlivro.getQuantidadeEntregue();
+			var quantidadeEntregueAtual = quantidadeEntregue - quantidade;
+			pedidoKitlivro.setQuantidadeEntregue(quantidadeEntregueAtual);
+		} else {
+			throw new ValidacaoException("O kit de livro informado na devolução não foi encontrado.");
+		}
 	}
 }

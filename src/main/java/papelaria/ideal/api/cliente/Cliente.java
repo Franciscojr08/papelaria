@@ -1,12 +1,12 @@
 package papelaria.ideal.api.cliente;
 
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
 import papelaria.ideal.api.aluno.Aluno;
-import papelaria.ideal.api.aluno.DadosClienteAluno;
+import papelaria.ideal.api.aluno.records.DadosListagemAluno;
 import papelaria.ideal.api.endereco.Endereco;
 import jakarta.persistence.*;
 import lombok.*;
+import papelaria.ideal.api.pedido.records.DadosListagemPedido;
 import papelaria.ideal.api.pedido.Pedido;
 
 import java.time.LocalDateTime;
@@ -42,18 +42,39 @@ public class Cliente {
     @Embedded @Valid
     private Endereco endereco;
 
-    public List<DadosClienteAluno> getDadosClienteAluno() {
+    public List<DadosListagemAluno> getDadosAlunos() {
         if (this.alunos == null) {
             return  new ArrayList<>();
         }
 
-        List<DadosClienteAluno> dadosClienteAlunoList = new ArrayList<>();
+        List<DadosListagemAluno> dadosClienteAlunoList = new ArrayList<>();
 
         for (Aluno aluno : this.alunos) {
-            var dadosClienteAluno = new DadosClienteAluno(aluno);
-            dadosClienteAlunoList.add(dadosClienteAluno);
+            if (!aluno.getAtivo()) {
+                continue;
+            }
+
+            dadosClienteAlunoList.add(new DadosListagemAluno(aluno));
         }
 
         return dadosClienteAlunoList;
+    }
+
+    public List<DadosListagemPedido> getDadosPedidos() {
+        if (this.pedidos == null) {
+            return new ArrayList<>();
+        }
+
+        List<DadosListagemPedido> dadosListagemPedido = new ArrayList<>();
+
+        for (Pedido pedido : this.pedidos) {
+            if (!pedido.getAtivo()) {
+                continue;
+            }
+
+            dadosListagemPedido.add(new DadosListagemPedido(pedido));
+        }
+
+        return dadosListagemPedido;
     }
 }

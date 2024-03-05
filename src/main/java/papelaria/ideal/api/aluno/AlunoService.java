@@ -3,6 +3,8 @@ package papelaria.ideal.api.aluno;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import papelaria.ideal.api.Turma.TurmaRepository;
+import papelaria.ideal.api.aluno.records.DadosAtualizacaoAluno;
+import papelaria.ideal.api.aluno.records.DadosCadastroAluno;
 import papelaria.ideal.api.cliente.ClienteRepository;
 import papelaria.ideal.api.errors.ValidacaoException;
 
@@ -29,9 +31,19 @@ public class AlunoService {
 		var cliente = clienteRepository.getReferenceById(dados.clienteResponsavelId());
 		var aluno = new Aluno();
 		aluno.setNome(dados.nome());
-		aluno.setMatricula(dados.matricula());
-		aluno.setRg(dados.rg());
-		aluno.setCpf(dados.cpf());
+
+		if (dados.matricula() != null) {
+			aluno.setMatricula(dados.matricula().replaceAll("[.-]", ""));
+		}
+
+		if (dados.rg() != null) {
+			aluno.setRg(dados.rg().replaceAll("[.-]", ""));
+		}
+
+		if (dados.cpf() != null) {
+			aluno.setCpf(dados.cpf().replaceAll("[.-]", ""));
+		}
+
 		aluno.setCliente(cliente);
 		aluno.setTurma(turma);
 		aluno.setAtivo(true);
@@ -41,13 +53,13 @@ public class AlunoService {
 	}
 
     private void validarIntegridade(DadosCadastroAluno dados) {
-        if (!clienteRepository.existsById(dados.clienteResponsavelId())) {
+        if (!clienteRepository.existsByIdAndAtivoTrue(dados.clienteResponsavelId())) {
             throw new ValidacaoException(
                     "Não foi possível cadastrar o aluno. O cliente informado é inválido ou não está cadastrado."
             );
         }
 
-		if (!turmaRepository.existsById(dados.turmaId())) {
+		if (!turmaRepository.existsByIdAndAtivoTrue(dados.turmaId())) {
 			throw new ValidacaoException(
 					"Não foi possível cadastrar o aluno. A turma informada é inválida ou não está cadastrada."
 			);
@@ -60,19 +72,25 @@ public class AlunoService {
             );
         }
 
-        if (dados.matricula() != null && alunoRepository.existsByMatricula(dados.matricula())) {
+        if (dados.matricula() != null &&
+		        alunoRepository.existsByMatriculaAndAtivoTrue(dados.matricula().replaceAll("[.-]", ""))
+        ) {
             throw new ValidacaoException(
                     "Não foi possível cadastrar o aluno. A matricula informada já está sendo utilizada por outro aluno."
             );
         }
 
-        if (dados.rg() != null && alunoRepository.existsByRg(dados.rg())) {
+        if (dados.rg() != null &&
+		        alunoRepository.existsByRgAndAtivoTrue(dados.rg().replaceAll("[.-]", ""))
+        ) {
             throw new ValidacaoException(
                     "Não foi possível cadastrar o aluno. o RG informado já está sendo utilizado por outro aluno."
             );
         }
 
-        if (dados.cpf() != null && alunoRepository.existsByCpf(dados.cpf())) {
+        if (dados.cpf() != null &&
+		        alunoRepository.existsByCpfAndAtivoTrue(dados.cpf().replaceAll("[.-]", ""))
+        ) {
             throw new ValidacaoException(
                     "Não foi possível cadastrar o aluno. O CPF informado já está sendo utilizado por outro aluno."
             );
@@ -80,13 +98,13 @@ public class AlunoService {
     }
 
 	private void validarIntegridadeAtualizacao(Aluno aluno, DadosAtualizacaoAluno dados) {
-		if (!clienteRepository.existsById(dados.clienteResponsavelId())) {
+		if (!clienteRepository.existsByIdAndAtivoTrue(dados.clienteResponsavelId())) {
 			throw new ValidacaoException(
 					"Não foi possível atualizar o aluno. O cliente informado é inválido ou não está cadastrado."
 			);
 		}
 
-		if (!turmaRepository.existsById(dados.turmaId())) {
+		if (!turmaRepository.existsByIdAndAtivoTrue(dados.turmaId())) {
 			throw new ValidacaoException(
 					"Não foi possível atualizar o aluno. A turma informada é inválida ou não está cadastrada."
 			);
@@ -100,8 +118,8 @@ public class AlunoService {
 		}
 
 		if (dados.matricula() != null &&
-				!Objects.equals(aluno.getMatricula(), dados.matricula()) &&
-				alunoRepository.existsByMatricula(dados.matricula())
+				!Objects.equals(aluno.getMatricula(), dados.matricula().replaceAll("[.-]", "")) &&
+				alunoRepository.existsByMatriculaAndAtivoTrue(dados.matricula().replaceAll("[.-]", ""))
 		) {
 			throw new ValidacaoException(
 					"Não foi possível atualizar o aluno. A matricula informada já está sendo utilizada por outro aluno."
@@ -109,8 +127,8 @@ public class AlunoService {
 		}
 
 		if (dados.rg() != null &&
-				!Objects.equals(aluno.getRg(), dados.rg()) &&
-				alunoRepository.existsByRg(dados.rg())
+				!Objects.equals(aluno.getRg(), dados.rg().replaceAll("[.-]", "")) &&
+				alunoRepository.existsByRgAndAtivoTrue(dados.rg().replaceAll("[.-]", ""))
 		) {
 			throw new ValidacaoException(
 					"Não foi possível atualizar o aluno. o RG informado já está sendo utilizado por outro aluno."
@@ -118,8 +136,8 @@ public class AlunoService {
 		}
 
 		if (dados.cpf() != null &&
-				!Objects.equals(aluno.getCpf(), dados.cpf()) &&
-				alunoRepository.existsByCpf(dados.cpf())
+				!Objects.equals(aluno.getCpf(), dados.cpf().replaceAll("[.-]", "")) &&
+				alunoRepository.existsByCpfAndAtivoTrue(dados.cpf().replaceAll("[.-]", ""))
 		) {
 			throw new ValidacaoException(
 					"Não foi possível atualizar o aluno. O CPF informado já está sendo utilizado por outro aluno."
@@ -135,15 +153,15 @@ public class AlunoService {
 	    }
 
 	    if (dados.matricula() != null) {
-		    aluno.setMatricula(dados.matricula());
+		    aluno.setMatricula(dados.matricula().replaceAll("[.-]", ""));
 	    }
 
 	    if (dados.rg() != null) {
-		    aluno.setRg(dados.rg());
+		    aluno.setRg(dados.rg().replaceAll("[.-]", ""));
 	    }
 
 	    if (dados.cpf() != null) {
-		    aluno.setCpf(dados.cpf());
+		    aluno.setCpf(dados.cpf().replaceAll("[.-]", ""));
 	    }
 
 	    if (dados.clienteResponsavelId() != null) {

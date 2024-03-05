@@ -9,7 +9,5 @@ public enum SituacaoListaPendenciaEnum {
     @Enumerated(EnumType.STRING)
     PENDENTE,
     @Enumerated(EnumType.STRING)
-    SOLICITADA,
-    @Enumerated(EnumType.STRING)
     CANCELADA
 }

@@ -8,6 +8,8 @@ import lombok.NoArgsConstructor;
 import papelaria.ideal.api.livro.Livro;
 import papelaria.ideal.api.pedido.Pedido;
 
+import java.util.Objects;
+
 @Data
 @Entity(name = "pedido_livro")
 @AllArgsConstructor
@@ -28,5 +30,18 @@ public class PedidoLivro {
 	private Livro livro;
 
 	private Long quantidade;
+	private Long quantidadeEntregue;
 	private Float valorUnitario;
+
+	public Float getValorTotalPedido() {
+		if (this.livro == null) {
+			return 0.0F;
+		}
+
+		return this.quantidade * this.valorUnitario;
+	}
+
+	public Boolean todosItensEntregues() {
+		return Objects.equals(this.quantidade, this.quantidadeEntregue);
+	}
 }

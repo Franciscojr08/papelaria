@@ -8,7 +8,9 @@ public interface TurmaRepository extends JpaRepository<Turma,Long> {
 
 	Page<Turma> findAllByAtivoTrue(Pageable page);
 
-	Boolean existsByNomeAndSerieId(String nome, Long serieId);
+	Boolean existsByNomeAndSerieIdAndAtivoTrue(String nome, Long serieId);
 
-	Boolean existsByNome(String nome);
+	Boolean existsByNomeAndAtivoTrue(String nome);
+
+	Boolean existsByIdAndAtivoTrue(Long id);
 }

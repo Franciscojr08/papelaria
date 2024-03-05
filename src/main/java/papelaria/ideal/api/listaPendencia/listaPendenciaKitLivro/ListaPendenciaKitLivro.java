@@ -8,6 +8,8 @@ import lombok.NoArgsConstructor;
 import papelaria.ideal.api.kitLivro.KitLivro;
 import papelaria.ideal.api.listaPendencia.ListaPendencia;
 
+import java.util.Objects;
+
 @Data
 @Entity(name = "lista_pendencia_kit_livro")
 @AllArgsConstructor
@@ -28,5 +30,9 @@ public class ListaPendenciaKitLivro {
     private KitLivro kitLivro;
 
     private Long quantidade;
+    private Long quantidadeEntregue;
 
+    public Boolean todosItensEntregues() {
+        return Objects.equals(this.quantidade, this.quantidadeEntregue);
+    }
 }

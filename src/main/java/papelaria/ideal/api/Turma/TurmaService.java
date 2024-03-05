@@ -3,9 +3,13 @@ package papelaria.ideal.api.Turma;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import papelaria.ideal.api.Serie.SerieRepository;
+import papelaria.ideal.api.Turma.records.DadosAtualizacaoTurma;
+import papelaria.ideal.api.Turma.records.DadosCadastroTurma;
+import papelaria.ideal.api.aluno.Aluno;
 import papelaria.ideal.api.errors.ValidacaoException;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Service
 public class TurmaService {
@@ -21,13 +25,13 @@ public class TurmaService {
 	}
 
 	private void validarIntegridade(String nomeTurma, Long serieId) {
-		if (!serieRepository.existsById(serieId)) {
+		if (!serieRepository.existsByIdAndAtivoTrue(serieId)) {
 			throw new ValidacaoException(
-					"Não foi possível cadastrar a turma. A série informada é inválida ou não esta cadastrada."
+					"Não foi possível cadastrar a turma. A série informada está inativa ou não esta cadastrada."
 			);
 		}
 
-		if (turmaRepository.existsByNomeAndSerieId(nomeTurma,serieId)) {
+		if (turmaRepository.existsByNomeAndSerieIdAndAtivoTrue(nomeTurma,serieId)) {
 			throw new ValidacaoException(
 					"Não foi possível cadastrar a turma. Já existe uma turma para essa série com esse mesmo nome."
 			);
@@ -46,22 +50,44 @@ public class TurmaService {
 	}
 
 	public void atualizarInformacoes(Turma turma, DadosAtualizacaoTurma dados) {
-		if (turma.getNome().equals(dados.nome()) && turmaRepository.existsByNome(dados.nome())) {
+		if (!Objects.equals(turma.getNome(), dados.nome()) &&
+				turmaRepository.existsByNomeAndAtivoTrue(dados.nome())
+		) {
 			throw new ValidacaoException(
 					"Não foi possível atualizar a turma. Já existe uma turma com esse mesmo nome."
 			);
+		}
+
+		if (!Objects.equals(turma.getSerie().getId(), dados.serieId()) &&
+				!serieRepository.existsByIdAndAtivoTrue(dados.serieId())
+		) {
+			throw new ValidacaoException(
+					"Não foi possível atualizar a turma. A série informada está inativa ou não esta cadastrada."
+			);
+		}
+
+		if (!Objects.equals(turma.getSerie().getId(), dados.serieId())) {
+			var serie = serieRepository.getReferenceById(dados.serieId());
+			turma.setSerie(serie);
 		}
 
 		if (dados.nome() != null) {
 			turma.setNome(dados.nome());
 		}
 
-		if (dados.ativo() != null) {
-			turma.setAtivo(dados.ativo());
-		}
-
-		if (dados.nome() != null || dados.ativo() != null) {
+		if (dados.nome() != null || !Objects.equals(turma.getSerie().getId(), dados.serieId())) {
 			turma.setDataAtualizacao(LocalDateTime.now());
 		}
+	}
+
+	public void deletar(Turma turma) {
+		if (turma.getAlunos().stream().anyMatch(Aluno::getAtivo)) {
+			throw new ValidacaoException(
+					"Não foi possível deletar a turma, a mesma está sendo utilizada em um ou mais alunos ativos."
+			);
+		}
+
+		turma.setAtivo(false);
+		turma.setDataAtualizacao(LocalDateTime.now());
 	}
 }

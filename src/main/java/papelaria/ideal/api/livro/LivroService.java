@@ -5,8 +5,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import papelaria.ideal.api.Serie.SerieRepository;
 import papelaria.ideal.api.errors.ValidacaoException;
+import papelaria.ideal.api.livro.records.DadosAtualizacaoLivro;
+import papelaria.ideal.api.livro.records.DadosCadastroLivro;
+import papelaria.ideal.api.pedido.Pedido;
+import papelaria.ideal.api.pedido.SituacaoPedidoEnum;
+import papelaria.ideal.api.pedido.livro.PedidoLivro;
 import papelaria.ideal.api.utils.LivroKitLivroServiceInterface;
 
+import javax.security.auth.login.LoginException;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
@@ -30,15 +36,27 @@ public class LivroService implements LivroKitLivroServiceInterface {
 	}
 
 	private void validarIntegridade(DadosCadastroLivro dados) {
-		if (livroRepository.existsByIdentificador(dados.identificador())) {
+		if (livroRepository.existsByAtivoTrueAndIdentificador(dados.identificador())) {
 			throw new ValidacaoException(
 					"Não foi possível cadastrar o livro. O identificador informado já está sendo utilizado em outro livro."
 			);
 		}
 
-		if (dados.serieId() != null && !serieRepository.existsById(dados.serieId())) {
+		if (dados.serieId() != null && !serieRepository.existsByIdAndAtivoTrue(dados.serieId())) {
 			throw new ValidacaoException(
-					"Não foi possível cadastrar o livro. A serie informada é inválida ou não está cadastrada."
+					"Não foi possível cadastrar o livro. A serie informada está inativa ou não está cadastrada."
+			);
+		}
+
+		if (dados.usoInterno() && dados.serieId() == null) {
+			throw new ValidacaoException(
+					"Não foi possível cadastrar o livro. É necessário informar a série para livros de uso interno."
+			);
+		}
+
+		if (dados.quantidadeDisponivel() < 0) {
+			throw new ValidacaoException(
+					"Não foi possível cadastrar o livro. A quantidade disponível deve ser maior que zero."
 			);
 		}
 	}
@@ -64,7 +82,7 @@ public class LivroService implements LivroKitLivroServiceInterface {
 	public void atualizarInformacoes(Livro livro, DadosAtualizacaoLivro dados) {
 		if (dados.identificador() != null &&
 				!Objects.equals(livro.getIdentificador(), dados.identificador()) &&
-				livroRepository.existsByIdentificador(dados.identificador())
+				livroRepository.existsByAtivoTrueAndIdentificador(dados.identificador())
 		) {
 			throw new ValidacaoException(
 					"Não foi possível atualizar o livro. O identificador informado já está sendo utilizado em outro livro."
@@ -73,10 +91,10 @@ public class LivroService implements LivroKitLivroServiceInterface {
 
 		if (dados.serieId() != null &&
 				!Objects.equals(livro.getSerie().getId(), dados.serieId()) &&
-				!serieRepository.existsById(dados.serieId())
+				!serieRepository.existsByIdAndAtivoTrue(dados.serieId())
 		) {
 			throw new ValidacaoException(
-					"Não foi possível atualizar o livro. A serie informada é inválida ou não está cadastrada."
+					"Não foi possível atualizar o livro. A serie informada está inativa ou não está cadastrada."
 			);
 		}
 
@@ -95,7 +113,7 @@ public class LivroService implements LivroKitLivroServiceInterface {
 		if (dados.valor() != null) {
 			if (dados.valor() < 0) {
 				throw new ValidacaoException(
-						"Não foi possível atualizar o livro. O valor tem que ser maior que zero."
+						"Não foi possível atualizar o livro. O valor deve ser maior que zero."
 				);
 			}
 
@@ -105,7 +123,7 @@ public class LivroService implements LivroKitLivroServiceInterface {
 		if (dados.quantidadeDisponivel() != null) {
 			if (dados.quantidadeDisponivel() < 0) {
 				throw new ValidacaoException(
-						"Não foi possível atualizar o livro. A quantidade disponível tem que ser maior que zero."
+						"Não foi possível atualizar o livro. A quantidade disponível deve ser maior que zero."
 				);
 			}
 
@@ -117,6 +135,28 @@ public class LivroService implements LivroKitLivroServiceInterface {
 			livro.setSerie(serie);
 		}
 
+		livro.setDataAtualizacao(LocalDateTime.now());
+	}
+
+	public void deletar(Livro livro) {
+		if (livro.getQuantidadePendenciasAtivas() > 0) {
+			throw new ValidacaoException(
+					"Não foi possível deletar o livro, o mesmo possui pendências ativas."
+			);
+		}
+
+		if (livro.getPedidoLivro() != null) {
+			for (PedidoLivro pedidoLivro : livro.getPedidoLivro()) {
+				var pedido = pedidoLivro.getPedido();
+				if (pedido.getSituacaoPedido() == SituacaoPedidoEnum.PENDENTE) {
+					throw new ValidacaoException(
+							"Não foi possível deletar o livro, o mesmo possui pedidos pendentes."
+					);
+				}
+			}
+		}
+
+		livro.setAtivo(false);
 		livro.setDataAtualizacao(LocalDateTime.now());
 	}
 }

@@ -6,8 +6,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ClienteRepository extends JpaRepository<Cliente, Long> {
 
-    Boolean existsByCpf(String cpf);
+    Boolean existsByAtivoTrueAndCpf(String cpf);
 
     Page<Cliente> findAllByAtivoTrue(Pageable page);
 
+    Boolean existsByIdAndAtivoTrue(Long id);
 }

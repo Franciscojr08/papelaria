@@ -2,7 +2,11 @@ package papelaria.ideal.api.Serie;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import papelaria.ideal.api.Serie.records.DadosAtualizacaoSerie;
+import papelaria.ideal.api.Serie.records.DadosCadastroSerie;
+import papelaria.ideal.api.Turma.Turma;
 import papelaria.ideal.api.errors.ValidacaoException;
+import papelaria.ideal.api.livro.Livro;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -14,7 +18,7 @@ public class SerieService {
 	private SerieRepository serieRepository;
 
 	public void cadastrar(DadosCadastroSerie dados) {
-		if (serieRepository.existsByNome(dados.nome())) {
+		if (serieRepository.existsByNomeAndAtivoTrue(dados.nome())) {
 			throw new ValidacaoException("Já existe uma série cadastrada com esse nome.");
 		}
 
@@ -31,20 +35,32 @@ public class SerieService {
 	}
 
 	public void atualizarInformacoes(Serie serie, DadosAtualizacaoSerie dados) {
-		if (!serie.getNome().equals(dados.nome()) && serieRepository.existsByNome(String.valueOf(dados.nome()))) {
+		if (!Objects.equals(serie.getNome(), dados.nome()) &&
+				serieRepository.existsByNomeAndAtivoTrue(String.valueOf(dados.nome()))
+		) {
 			throw new ValidacaoException("Já existe uma série cadastrada com esse nome.");
 		}
 
 		if (dados.nome() != null) {
 			serie.setNome(dados.nome());
-		}
-
-		if (dados.ativo() != null) {
-			serie.setAtivo(dados.ativo());
-		}
-
-		if (dados.nome() != null || dados.ativo() != null) {
 			serie.setDataAtualizacao(LocalDateTime.now());
 		}
+	}
+
+	public void deletar(Serie serie) {
+		if (serie.getTurmas().stream().anyMatch(Turma::getAtivo)) {
+			throw new ValidacaoException(
+					"Não foi possível deletar a série, a mesma está sendo utilizada em uma ou mais turmas ativas."
+			);
+		}
+
+		if (serie.getLivros().stream().anyMatch(Livro::getAtivo)) {
+			throw new ValidacaoException(
+					"Não foi possível deletar a série, a mesma está sendo utilizada em um ou mais livros ativos."
+			);
+		}
+
+		serie.setAtivo(false);
+		serie.setDataAtualizacao(LocalDateTime.now());
 	}
 }

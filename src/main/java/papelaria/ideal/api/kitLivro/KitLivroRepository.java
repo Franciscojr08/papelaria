@@ -8,7 +8,9 @@ public interface KitLivroRepository extends JpaRepository<KitLivro,Long> {
 
 	Boolean existsByIdAndAtivoFalse(Long id);
 
-	Boolean existsByNome(String nome);
+	Boolean existsByAtivoTrueAndNome(String nome);
 
 	Page<KitLivro> findAllByAtivoTrue(Pageable page);
+
+	Boolean existsByIdAndAtivoTrue(Long id);
 }

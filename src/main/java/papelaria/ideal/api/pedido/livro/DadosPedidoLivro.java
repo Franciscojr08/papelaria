@@ -5,6 +5,7 @@ public record DadosPedidoLivro(
 		String identificador,
 		String nome,
 		Long quantidade,
+		Long quantidadeEntregue,
 		Float valorUnitario,
 		Float valorTotal
 ) {

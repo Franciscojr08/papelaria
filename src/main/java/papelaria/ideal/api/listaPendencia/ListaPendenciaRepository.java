@@ -8,4 +8,5 @@ public interface ListaPendenciaRepository extends JpaRepository<ListaPendencia, 
 
     Page<ListaPendencia> findAllByAtivoTrue(Pageable paginacao);
 
+    Boolean existsByIdAndAtivoTrue(Long id);
 }

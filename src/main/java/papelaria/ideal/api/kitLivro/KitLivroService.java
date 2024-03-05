@@ -4,9 +4,12 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import papelaria.ideal.api.errors.ValidacaoException;
-import papelaria.ideal.api.listaPendencia.ListaPendencia;
+import papelaria.ideal.api.kitLivro.records.DadosAtualizacaoKitLivro;
+import papelaria.ideal.api.kitLivro.records.DadosCadastroKitLivro;
 import papelaria.ideal.api.listaPendencia.SituacaoListaPendenciaEnum;
-import papelaria.ideal.api.livro.DadosAtualizacaoLivro;
+import papelaria.ideal.api.pedido.SituacaoPedidoEnum;
+import papelaria.ideal.api.pedido.kitLivro.PedidoKitLivro;
+import papelaria.ideal.api.pedido.livro.PedidoLivro;
 import papelaria.ideal.api.utils.LivroKitLivroServiceInterface;
 
 import java.time.LocalDateTime;
@@ -25,9 +28,15 @@ public class KitLivroService implements LivroKitLivroServiceInterface {
 	}
 
 	public void cadastrar(DadosCadastroKitLivro dados) {
-		if (kitLivroRepository.existsByNome(dados.nome())) {
+		if (kitLivroRepository.existsByAtivoTrueAndNome(dados.nome())) {
 			throw new ValidacaoException(
 					"Não foi possível cadastrar o kit livro. O nome informado já está cadastrado"
+			);
+		}
+
+		if (dados.quantidadeDisponivel() < 0) {
+			throw new ValidacaoException(
+					"Não foi possível cadastrar o kit livro. A quantidade disponível deve ser maior que zero."
 			);
 		}
 
@@ -49,7 +58,7 @@ public class KitLivroService implements LivroKitLivroServiceInterface {
 	public void atualizarInformacoes(KitLivro kitLivro, DadosAtualizacaoKitLivro dados) {
 		if (dados.nome() != null &&
 				!Objects.equals(kitLivro.getNome(), dados.nome()) &&
-				kitLivroRepository.existsByNome(dados.nome())) {
+				kitLivroRepository.existsByAtivoTrueAndNome(dados.nome())) {
 			throw new ValidacaoException(
 					"Não foi possível atualizar o kit livro. O nome informado já está cadastrado"
 			);
@@ -76,7 +85,7 @@ public class KitLivroService implements LivroKitLivroServiceInterface {
 		if (dados.quantidadeDisponivel() != null) {
 			if (dados.quantidadeDisponivel() < 0) {
 				throw new ValidacaoException(
-						"Não foi possível atualizar o kit livro. A quantidade disponível tem que ser maior que zero."
+						"Não foi possível atualizar o kit livro. A quantidade disponível deve ser maior que zero."
 				);
 			}
 
@@ -87,10 +96,21 @@ public class KitLivroService implements LivroKitLivroServiceInterface {
 	}
 
 	public void deletar(KitLivro kitLivro) {
-		if (kitLivro.getListaPendenciaKitLivro().stream().anyMatch(ListaPendencia -> SituacaoListaPendenciaEnum.PENDENTE.equals(ListaPendencia.getListaPendencia().getSituacao()))) {
+		if (kitLivro.getQuantidadePendenciasAtivas() > 0) {
 			throw new ValidacaoException(
-					"Não foi possível excluir o kit livro. O mesmo está em uma lista de pendência que está pendente."
+					"Não foi possível deletar o kit de livro, o mesmo possui pendências ativas."
 			);
+		}
+
+		if (kitLivro.getPedidoKitLivro() != null) {
+			for (PedidoKitLivro pedidoKitLivro : kitLivro.getPedidoKitLivro()) {
+				var pedido = pedidoKitLivro.getPedido();
+				if (pedido.getSituacaoPedido() == SituacaoPedidoEnum.PENDENTE) {
+					throw new ValidacaoException(
+							"Não foi possível deletar o kit de livro, o mesmo possui pedidos pendentes."
+					);
+				}
+			}
 		}
 
 		kitLivro.setAtivo(false);

@@ -9,7 +9,10 @@ import papelaria.ideal.api.listaPendencia.listaPendenciaKitLivro.DadosListaPende
 import papelaria.ideal.api.listaPendencia.listaPendenciaKitLivro.ListaPendenciaKitLivro;
 import papelaria.ideal.api.listaPendencia.listaPendenciaLivro.DadosListaPendenciaLivro;
 import papelaria.ideal.api.listaPendencia.listaPendenciaLivro.ListaPendenciaLivro;
+import papelaria.ideal.api.listaPendencia.records.DadosAtualizacaoListaPendencia;
 import papelaria.ideal.api.pedido.Pedido;
+import papelaria.ideal.api.pedido.kitLivro.PedidoKitLivro;
+import papelaria.ideal.api.pedido.livro.PedidoLivro;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -32,7 +35,6 @@ public class ListaPendencia {
     private LocalDateTime dataCadastro;
     private LocalDateTime dataEntrega;
     private LocalDateTime dataAtualizacao;
-    private Boolean entregue;
     private Boolean ativo;
 
     @OneToOne(fetch = FetchType.LAZY)
@@ -50,36 +52,20 @@ public class ListaPendencia {
     public ListaPendencia(
             Pedido pedido,
             LocalDateTime dataCadastro,
-            LocalDateTime dataEntrega,
             SituacaoListaPendenciaEnum situacao,
-            Boolean entregue
+            Boolean ativo
     ) {
         this.pedido = pedido;
         this.dataCadastro = dataCadastro;
-        this.dataEntrega = dataEntrega;
         this.situacao = situacao;
-        this.entregue = entregue;
+        this.ativo = ativo;
     }
 
-    public void atualizarInformacoes(DadosAtualizacaoListaPendencia dados) {
-        if (dados.situacao() != null) {
-            this.situacao = dados.situacao();
-        }
+    public Boolean todosItensEntregues() {
+        var todosLivrosEntregues = this.listaPendenciaLivro.stream().allMatch(ListaPendenciaLivro::todosItensEntregues);
+        var todosKitLivrosEntregues = this.listaPendenciaKitLivro.stream().allMatch(ListaPendenciaKitLivro::todosItensEntregues);
 
-        if (dados.dataEntrega() != null) {
-            if (dados.dataEntrega().isBefore(this.pedido.getDataPedido())) {
-                throw new ValidacaoException("A data de entrega não pode ser inferior a data do pedido.");
-            }
-
-            this.dataEntrega = dados.dataEntrega();
-        }
-
-        if (dados.entregue()) {
-            this.entregue = true;
-            this.situacao = SituacaoListaPendenciaEnum.ENTREGUE;
-        }
-
-        this.dataAtualizacao = LocalDateTime.now();
+	    return todosLivrosEntregues && todosKitLivrosEntregues;
     }
 
     public List<DadosListaPendenciaLivro> getDadosListaPendenciaLivro() {
@@ -94,7 +80,8 @@ public class ListaPendencia {
                     listaPendenciaLivro.getLivro().getId(),
                     listaPendenciaLivro.getLivro().getIdentificador(),
                     listaPendenciaLivro.getLivro().getNome(),
-                    listaPendenciaLivro.getQuantidade()
+                    listaPendenciaLivro.getQuantidade(),
+                    listaPendenciaLivro.getQuantidadeEntregue()
             );
 
             listaPendenciaLivroList.add(dadosListaPendenciaLivro);
@@ -114,7 +101,8 @@ public class ListaPendencia {
             var dadosListaPendenciaKitLivro = new DadosListaPendenciaKitLivro(
                     listaPendenciaKitLivro.getKitLivro().getId(),
                     listaPendenciaKitLivro.getKitLivro().getNome(),
-                    listaPendenciaKitLivro.getQuantidade()
+                    listaPendenciaKitLivro.getQuantidade(),
+                    listaPendenciaKitLivro.getQuantidadeEntregue()
             );
 
             listaPendenciaKitLivroList.add(dadosListaPendenciaKitLivro);
@@ -122,5 +110,49 @@ public class ListaPendencia {
 
         return listaPendenciaKitLivroList;
     }
-}
 
+    public Boolean isEntregue() {
+        return this.situacao == SituacaoListaPendenciaEnum.ENTREGUE;
+    }
+
+    public Long getQuantidadeLivrosByEntregueTrueOrFalse(Boolean entregue) {
+        if (this.listaPendenciaLivro == null) {
+            return 0L;
+        }
+
+        var quantidadeLivros = 0L;
+        for (ListaPendenciaLivro listaPendenciaLivro : this.listaPendenciaLivro) {
+            if (entregue) {
+                quantidadeLivros += listaPendenciaLivro.getQuantidadeEntregue();
+            } else {
+                quantidadeLivros += listaPendenciaLivro.getQuantidade();
+            }
+        }
+
+        return quantidadeLivros;
+    }
+
+    public Long getQuantidadeKitLivrosByEntregueTrueOrFalse(Boolean entregue) {
+        if (this.listaPendenciaKitLivro == null) {
+            return 0L;
+        }
+
+        var quantidadeLivros = 0L;
+        for (ListaPendenciaKitLivro listaPendenciaKitLivro : this.listaPendenciaKitLivro) {
+            if (entregue) {
+                quantidadeLivros += listaPendenciaKitLivro.getQuantidadeEntregue();
+            } else {
+                quantidadeLivros += listaPendenciaKitLivro.getQuantidade();
+            }
+        }
+
+        return quantidadeLivros;
+    }
+
+    public Boolean algumItemEntregue() {
+        var livrosEntregues = this.listaPendenciaLivro.stream().mapToLong(ListaPendenciaLivro::getQuantidadeEntregue).sum();
+        var kitLivrosEntregues = this.listaPendenciaKitLivro.stream().mapToLong(ListaPendenciaKitLivro::getQuantidadeEntregue).sum();
+
+        return (livrosEntregues > 0) || (kitLivrosEntregues > 0);
+    }
+}

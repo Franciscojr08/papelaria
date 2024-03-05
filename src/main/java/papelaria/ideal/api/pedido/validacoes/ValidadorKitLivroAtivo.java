@@ -4,8 +4,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import papelaria.ideal.api.errors.ValidacaoException;
 import papelaria.ideal.api.kitLivro.KitLivroRepository;
-import papelaria.ideal.api.pedido.DadosCadastroPedido;
-import papelaria.ideal.api.pedido.DadosCadastroPedidoLivroKitLivro;
+import papelaria.ideal.api.pedido.records.DadosCadastroPedido;
+import papelaria.ideal.api.pedido.records.DadosPedidoLivroKitLivro;
 
 @Component
 public class ValidadorKitLivroAtivo implements ValidadorPedidoInterface {
@@ -18,18 +18,11 @@ public class ValidadorKitLivroAtivo implements ValidadorPedidoInterface {
 			return;
 		}
 
-		for (DadosCadastroPedidoLivroKitLivro livro : dados.kitLivros()) {
-			if (!kitLivroRepository.existsById(livro.id())) {
+		for (DadosPedidoLivroKitLivro livro : dados.kitLivros()) {
+			if (!kitLivroRepository.existsByIdAndAtivoTrue(livro.id())) {
 				throw new ValidacaoException(
-						"O pedido não pôde ser cadastrado pois algum kit de livro adicionado não está cadastrado!"
-				);
-			}
-		}
-
-		for (DadosCadastroPedidoLivroKitLivro livro : dados.kitLivros()) {
-			if (kitLivroRepository.existsByIdAndAtivoFalse(livro.id())) {
-				throw new ValidacaoException(
-						"O pedido não pôde ser cadastrado pois algum kit de livro adicionado está inativo!"
+						"O pedido não pôde ser cadastrado pois algum kit de livro adicionado está inativo ou" +
+						" não está cadastrado!"
 				);
 			}
 		}

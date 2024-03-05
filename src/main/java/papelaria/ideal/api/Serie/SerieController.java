@@ -5,8 +5,15 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import papelaria.ideal.api.Serie.records.DadosAtualizacaoSerie;
+import papelaria.ideal.api.Serie.records.DadosCadastroSerie;
+import papelaria.ideal.api.Serie.records.DadosDetalhamentoSerie;
+import papelaria.ideal.api.Serie.records.DadosListagemSerie;
+import papelaria.ideal.api.errors.DadosResponse;
+import papelaria.ideal.api.errors.ValidacaoException;
 
 import java.time.LocalDateTime;
 
@@ -21,42 +28,62 @@ public class SerieController {
 
 	@PostMapping
 	@Transactional
-	public ResponseEntity<String> cadastrar(@RequestBody @Valid DadosCadastroSerie dados) {
+	public ResponseEntity<DadosResponse> cadastrar(@RequestBody @Valid DadosCadastroSerie dados) {
 		serieService.cadastrar(dados);
+		var dadosResponse = new DadosResponse(
+				LocalDateTime.now(),
+				"Sucesso",
+				HttpStatus.OK.value(),
+				"Série cadastrada com sucesso!"
+		);
 
-		return ResponseEntity.ok().body("Série cadastrada com sucesso!");
+		return ResponseEntity.ok().body(dadosResponse);
 	}
 
 	@GetMapping
-	public ResponseEntity<Page<DadosSerie>> listar(Pageable paginacao) {
-		var page = serieRepository.findAllByAtivoTrue(paginacao).map(DadosSerie::new);
+	public ResponseEntity<Page<DadosListagemSerie>> listar(Pageable paginacao) {
+		var page = serieRepository.findAllByAtivoTrue(paginacao).map(DadosListagemSerie::new);
 
 		return ResponseEntity.ok().body(page);
 	}
 
 	@GetMapping("/{id}")
-	public ResponseEntity<DadosSerie> detalhar(@PathVariable Long id) {
-		var serie = serieRepository.getReferenceById(id);
+	public ResponseEntity<DadosDetalhamentoSerie> detalhar(@PathVariable Long id) {
+		if (!serieRepository.existsByIdAndAtivoTrue(id)) {
+			throw new ValidacaoException("Série não encontrada ou inativa.");
+		}
 
-		return ResponseEntity.ok().body(new DadosSerie(serie));
+		return ResponseEntity.ok().body(new DadosDetalhamentoSerie(serieRepository.getReferenceById(id)));
 	}
 
 	@PutMapping
 	@Transactional
-	public ResponseEntity<DadosSerie> atualizar(@RequestBody @Valid DadosAtualizacaoSerie dados) {
-		var serie = serieRepository.getReferenceById(dados.id());
-		serieService.atualizarInformacoes(serie,dados);
+	public ResponseEntity<DadosDetalhamentoSerie> atualizar(@RequestBody @Valid DadosAtualizacaoSerie dados) {
+		if (!serieRepository.existsByIdAndAtivoTrue(dados.id())) {
+			throw new ValidacaoException("Série não encontrada ou inativa.");
+		}
 
-		return ResponseEntity.ok().body(new DadosSerie(serie));
+		serieService.atualizarInformacoes(serieRepository.getReferenceById(dados.id()),dados);
+
+		return ResponseEntity.ok().body(new DadosDetalhamentoSerie(serieRepository.getReferenceById(dados.id())));
 	}
 
 	@DeleteMapping("/{id}")
 	@Transactional
-	public ResponseEntity deletar(@PathVariable Long id) {
-		var serie = serieRepository.getReferenceById(id);
-		serie.setAtivo(false);
-		serie.setDataAtualizacao(LocalDateTime.now());
+	public ResponseEntity<DadosResponse> deletar(@PathVariable Long id) {
+		if (!serieRepository.existsByIdAndAtivoTrue(id)) {
+			throw new ValidacaoException("Série não encontrada ou inativa.");
+		}
 
-		return ResponseEntity.noContent().build();
+		serieService.deletar(serieRepository.getReferenceById(id));
+
+		var dadosResponse = new DadosResponse(
+				LocalDateTime.now(),
+				"Sucesso",
+				HttpStatus.OK.value(),
+				"Série deletada com sucesso!"
+		);
+
+		return ResponseEntity.ok().body(dadosResponse);
 	}
 }

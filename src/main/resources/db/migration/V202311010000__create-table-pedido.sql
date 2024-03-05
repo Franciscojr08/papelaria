@@ -100,11 +100,12 @@ ALTER TABLE pedido ADD CONSTRAINT pedido_cliente_1 FOREIGN KEY (cliente_id) REFE
 
 CREATE TABLE pedido_livro
 (
-    id             SMALLINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
-    quantidade     INT NOT NULL,
-    valor_unitario DECIMAL(10, 2) NOT NULL,
-    pedido_id      SMALLINT UNSIGNED NOT NULL,
-    livro_id       SMALLINT UNSIGNED NOT NULL
+    id                  SMALLINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+    quantidade          INT               NOT NULL,
+    quantidade_entregue INT UNSIGNED DEFAULT 0,
+    valor_unitario      DECIMAL(10, 2)    NOT NULL,
+    pedido_id           SMALLINT UNSIGNED NOT NULL,
+    livro_id            SMALLINT UNSIGNED NOT NULL
 );
 
 ALTER TABLE pedido_livro ADD CONSTRAINT pedidoLivro_pedido_1 FOREIGN KEY (pedido_id) REFERENCES pedido (id);
@@ -112,11 +113,12 @@ ALTER TABLE pedido_livro ADD CONSTRAINT pedidoLivro_livro_1 FOREIGN KEY (livro_i
 
 CREATE TABLE pedido_kit_livro
 (
-    id             SMALLINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
-    quantidade     INT NOT NULL,
-    valor_unitario DECIMAL(10, 2) NOT NULL,
-    pedido_id      SMALLINT UNSIGNED NOT NULL,
-    kit_livro_id   SMALLINT UNSIGNED NOT NULL
+    id                  SMALLINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+    quantidade          INT               NOT NULL,
+    quantidade_entregue INT UNSIGNED DEFAULT 0,
+    valor_unitario      DECIMAL(10, 2)    NOT NULL,
+    pedido_id           SMALLINT UNSIGNED NOT NULL,
+    kit_livro_id        SMALLINT UNSIGNED NOT NULL
 );
 
 ALTER TABLE pedido_kit_livro ADD CONSTRAINT pedidoKitLivro_pedido_1 FOREIGN KEY (pedido_id) REFERENCES pedido (id);
@@ -130,7 +132,6 @@ CREATE TABLE lista_pendencia
     data_atualizacao DATETIME NULL,
     situacao         VARCHAR(50) NOT NULL,
     pedido_id        SMALLINT UNSIGNED NOT NULL,
-    entregue         BOOLEAN NOT NULL DEFAULT FALSE,
     ativo            BOOLEAN NOT NULL DEFAULT TRUE
 );
 
@@ -138,10 +139,11 @@ ALTER TABLE lista_pendencia ADD CONSTRAINT listaPendencia_pedido_1 FOREIGN KEY (
 
 CREATE TABLE lista_pendencia_livro
 (
-    id                 SMALLINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
-    quantidade         INT NOT NULL,
-    lista_pendencia_id SMALLINT UNSIGNED NOT NULL,
-    livro_id           SMALLINT UNSIGNED NOT NULL
+    id                  SMALLINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+    quantidade          INT UNSIGNED      NOT NULL,
+    quantidade_entregue INT UNSIGNED DEFAULT 0,
+    lista_pendencia_id  SMALLINT UNSIGNED NOT NULL,
+    livro_id            SMALLINT UNSIGNED NOT NULL
 );
 
 ALTER TABLE lista_pendencia_livro ADD CONSTRAINT listaPendenciaLivro_listaPendencia_1 FOREIGN KEY (lista_pendencia_id) REFERENCES lista_pendencia (id);
@@ -149,10 +151,11 @@ ALTER TABLE lista_pendencia_livro ADD CONSTRAINT listaPendenciaLivro_livro_1 FOR
 
 CREATE TABLE lista_pendencia_kit_livro
 (
-    id                 SMALLINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
-    quantidade         INT NOT NULL,
-    lista_pendencia_id SMALLINT UNSIGNED NOT NULL,
-    kit_livro_id       SMALLINT UNSIGNED NOT NULL
+    id                  SMALLINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+    quantidade          INT UNSIGNED      NOT NULL,
+    quantidade_entregue INT UNSIGNED DEFAULT 0,
+    lista_pendencia_id  SMALLINT UNSIGNED NOT NULL,
+    kit_livro_id        SMALLINT UNSIGNED NOT NULL
 );
 
 ALTER TABLE lista_pendencia_kit_livro ADD CONSTRAINT listaPendenciaKitLivro_listaPendencia_1 FOREIGN KEY (lista_pendencia_id) REFERENCES lista_pendencia (id);
