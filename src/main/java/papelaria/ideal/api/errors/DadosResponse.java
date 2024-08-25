@@ -15,7 +15,7 @@ public class DadosResponse {
 	private String mensagem;
 	private List<DadosErrosValidacao> dados;
 
-	public      DadosResponse(LocalDateTime dataHora, String tipo, Integer status, String mensagem) {
+	public DadosResponse(LocalDateTime dataHora, String tipo, Integer status, String mensagem) {
 		this.dataHora = dataHora.toString();
 		this.tipo = tipo;
 		this.status = status;

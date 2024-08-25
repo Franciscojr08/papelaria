@@ -17,6 +17,7 @@ import papelaria.ideal.api.kitLivro.records.DadosListagemKitLivro;
 
 import java.time.LocalDateTime;
 
+@CrossOrigin(origins = "http://localhost:4200")
 @RestController
 @RequestMapping("/kitLivro")
 public class KitLivroController {
