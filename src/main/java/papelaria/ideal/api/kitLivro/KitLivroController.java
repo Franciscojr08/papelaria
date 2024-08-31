@@ -10,10 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import papelaria.ideal.api.errors.DadosResponse;
 import papelaria.ideal.api.errors.ValidacaoException;
-import papelaria.ideal.api.kitLivro.records.DadosAtualizacaoKitLivro;
-import papelaria.ideal.api.kitLivro.records.DadosCadastroKitLivro;
-import papelaria.ideal.api.kitLivro.records.DadosDetalhamentoKitLivro;
-import papelaria.ideal.api.kitLivro.records.DadosListagemKitLivro;
+import papelaria.ideal.api.kitLivro.records.*;
 
 import java.time.LocalDateTime;
 
@@ -47,6 +44,21 @@ public class KitLivroController {
 
 		return ResponseEntity.ok().body(page);
 	}
+
+	@GetMapping("/filtrar")
+	public ResponseEntity<Page<DadosListagemKitLivro>> filtrar(
+			Pageable pageable,
+			@RequestParam(required = false) String nome,
+			@RequestParam(required = false) Float valor,
+			@RequestParam(required = false) Long quantidadeDisponivel
+	) {
+		var filtros = new DadosFiltragemKitLivro(nome,valor,quantidadeDisponivel);
+
+		var page = kitLivroService.filtrar(filtros, pageable).map(DadosListagemKitLivro::new);
+
+		return ResponseEntity.ok().body(page);
+	}
+
 
 	@GetMapping("/{id}")
 	public ResponseEntity<DadosDetalhamentoKitLivro> detalhar(@PathVariable Long id) {

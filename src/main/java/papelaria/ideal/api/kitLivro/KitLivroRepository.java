@@ -6,7 +6,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface KitLivroRepository extends JpaRepository<KitLivro,Long> {
 
-	Boolean existsByIdAndAtivoFalse(Long id);
 
 	Boolean existsByAtivoTrueAndNome(String nome);
 
