@@ -14,6 +14,7 @@ import papelaria.ideal.api.pedido.records.*;
 
 import java.time.LocalDateTime;
 
+@CrossOrigin(origins = "http://localhost:4200")
 @RestController
 @RequestMapping("/pedido")
 public class PedidoController {
@@ -51,6 +52,15 @@ public class PedidoController {
 		}
 
 		return ResponseEntity.ok().body(new DadosDetalhamentoPedido(pedidoRepository.getReferenceById(id)));
+	}
+
+	@GetMapping("/listar-por-kit/{kitLivroId}")
+	public ResponseEntity<Page<DadosListagemPedido>> listarPedidosPorKitLivro(
+			@PathVariable Long kitLivroId,
+			Pageable pageable
+	) {
+		Page<DadosListagemPedido> pedidos = pedidoService.listarPedidosPorKitLivro(kitLivroId, pageable);
+		return ResponseEntity.ok(pedidos);
 	}
 
 	@PutMapping

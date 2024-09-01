@@ -1,6 +1,8 @@
 package papelaria.ideal.api.pedido;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import papelaria.ideal.api.cliente.Cliente;
 import papelaria.ideal.api.cliente.ClienteRepository;
@@ -15,10 +17,7 @@ import papelaria.ideal.api.livro.LivroRepository;
 import papelaria.ideal.api.livro.LivroService;
 import papelaria.ideal.api.pedido.kitLivro.PedidoKitLivro;
 import papelaria.ideal.api.pedido.livro.PedidoLivro;
-import papelaria.ideal.api.pedido.records.DadosAtualizacaoPedido;
-import papelaria.ideal.api.pedido.records.DadosCadastroPedido;
-import papelaria.ideal.api.pedido.records.DadosPedidoLivroKitLivro;
-import papelaria.ideal.api.pedido.records.DadosCancelamentoPedido;
+import papelaria.ideal.api.pedido.records.*;
 import papelaria.ideal.api.pedido.validacoes.ValidadorPedidoInterface;
 
 import java.time.LocalDateTime;
@@ -298,5 +297,10 @@ public class PedidoService {
 
 		pedido.setAtivo(false);
 		pedido.setSituacaoPedido(SituacaoPedidoEnum.CANCELADO);
+	}
+
+	public Page<DadosListagemPedido> listarPedidosPorKitLivro(Long kitLivroId, Pageable pageable) {
+		return pedidoRepository.findByKitLivroId(kitLivroId, pageable)
+				.map(DadosListagemPedido::new);
 	}
 }

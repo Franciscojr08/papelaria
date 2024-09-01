@@ -243,4 +243,22 @@ public class Pedido {
 			throw new ValidacaoException("O kit de livro informado na devolução não foi encontrado.");
 		}
 	}
+
+	public Long getTotalKitsPendentes() {
+		var quantidade =  this.getListaPendencia().getQuantidadeKitLivrosByEntregueTrueOrFalse(false);
+		var quantidadeEntregue =  this.getListaPendencia().getQuantidadeKitLivrosByEntregueTrueOrFalse(true);
+
+		return quantidade - quantidadeEntregue;
+	}
+
+	public Long getTotalLivrosPendentes() {
+		var quantidade =  this.getListaPendencia().getQuantidadeLivrosByEntregueTrueOrFalse(false);
+		var quantidadeEntregue =  this.getListaPendencia().getQuantidadeLivrosByEntregueTrueOrFalse(true);
+
+		return quantidade - quantidadeEntregue;
+	}
+
+	public Long getTotalPendencias() {
+		return this.getTotalKitsPendentes() + this.getTotalLivrosPendentes();
+	}
 }

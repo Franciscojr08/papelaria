@@ -14,11 +14,13 @@ import papelaria.ideal.api.listaPendencia.records.DadosAtualizacaoListaPendencia
 import papelaria.ideal.api.listaPendencia.records.DadosCancelamentoListaPendencia;
 import papelaria.ideal.api.listaPendencia.records.DadosDetalhamentoListaPendencia;
 import papelaria.ideal.api.listaPendencia.records.DadosListagemListaPendencia;
+import papelaria.ideal.api.pedido.records.DadosListagemPedido;
 
 import java.time.LocalDateTime;
 
+@CrossOrigin(origins = "http://localhost:4200")
 @RestController
-@RequestMapping("ListaPendencia")
+@RequestMapping("lista-pendencia")
 public class ListaPendenciaController {
 
     @Autowired
@@ -40,6 +42,18 @@ public class ListaPendenciaController {
         }
 
         return ResponseEntity.ok().body(new DadosDetalhamentoListaPendencia(listaPendenciaRepository.getReferenceById(id)));
+    }
+
+    @GetMapping("/listar-por-kit/{kitLivroId}")
+    public ResponseEntity<Page<DadosListagemListaPendencia>> listarPedidosPorKitLivro(
+            @PathVariable Long kitLivroId,
+            Pageable pageable
+    ) {
+        Page<DadosListagemListaPendencia> listaPendencia = listaPendenciaService.listarPedidosPorKitLivro(
+                kitLivroId,
+                pageable
+        );
+        return ResponseEntity.ok(listaPendencia);
     }
 
     @PutMapping

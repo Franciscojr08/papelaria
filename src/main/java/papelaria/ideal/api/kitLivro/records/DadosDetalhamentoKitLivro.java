@@ -13,8 +13,6 @@ public record DadosDetalhamentoKitLivro(
 		String descricao,
 		Float valor,
 		Long quantidadeDisponivel,
-		List<DadosListagemPedido> pedidos,
-		List<DadosListagemListaPendencia> pendencias,
 		LocalDateTime dataCadastro,
 		LocalDateTime dataAtualizacao
 ) {
@@ -25,8 +23,6 @@ public record DadosDetalhamentoKitLivro(
 				kitLivro.getDescricao(),
 				kitLivro.getValor(),
 				kitLivro.getQuantidadeDisponivel(),
-				kitLivro.getDadosPedido(),
-				kitLivro.getDadosListaPendencia(),
 				kitLivro.getDataCadastro(),
 				kitLivro.getDataAtualizacao()
 		);

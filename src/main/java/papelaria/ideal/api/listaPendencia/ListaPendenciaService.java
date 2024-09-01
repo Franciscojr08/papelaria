@@ -1,21 +1,21 @@
 package papelaria.ideal.api.listaPendencia;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import papelaria.ideal.api.errors.ValidacaoException;
 import papelaria.ideal.api.kitLivro.KitLivroRepository;
 import papelaria.ideal.api.listaPendencia.listaPendenciaKitLivro.ListaPendenciaKitLivro;
 import papelaria.ideal.api.listaPendencia.listaPendenciaLivro.ListaPendenciaLivro;
-import papelaria.ideal.api.listaPendencia.records.DadosAtualizacaoListaPendencia;
-import papelaria.ideal.api.listaPendencia.records.DadosCadastroListaPendencia;
-import papelaria.ideal.api.listaPendencia.records.DadosCadastroPendenciaLivroKitLivro;
-import papelaria.ideal.api.listaPendencia.records.DadosCancelamentoListaPendencia;
+import papelaria.ideal.api.listaPendencia.records.*;
 import papelaria.ideal.api.livro.LivroRepository;
 import papelaria.ideal.api.pedido.PedidoRepository;
 import papelaria.ideal.api.pedido.PedidoService;
 import papelaria.ideal.api.pedido.SituacaoPedidoEnum;
 import papelaria.ideal.api.pedido.kitLivro.PedidoKitLivro;
 import papelaria.ideal.api.pedido.livro.PedidoLivro;
+import papelaria.ideal.api.pedido.records.DadosListagemPedido;
 import papelaria.ideal.api.pedido.records.DadosPedidoLivroKitLivro;
 
 import java.time.LocalDateTime;
@@ -274,5 +274,10 @@ public class ListaPendenciaService {
 			pedido.setSituacaoPedido(SituacaoPedidoEnum.FINALIZADO);
 			pedido.setDataEntrega(LocalDateTime.now());
 		}
+	}
+
+	public Page<DadosListagemListaPendencia> listarPedidosPorKitLivro(Long kitLivroId, Pageable pageable) {
+		return listaPendenciaRepository.findByKitLivroId(kitLivroId, pageable)
+				.map(DadosListagemListaPendencia::new);
 	}
 }

@@ -13,15 +13,13 @@ import java.util.List;
 public record DadosListagemPedido(
 		Long id,
 		LocalDateTime dataPedido,
-		String nome_cliente,
+		String nomeCliente,
 		Float valor,
 		Float desconto,
 		Float valorTotal,
-		Boolean pendencia,
+		String pendencia,
 		Long quantidadeLivros,
-		Long quantidadeLivrosEntregue,
 		Long quantidadeKitLivros,
-		Long quantidadeKitLivrosEntregue,
 		FormaPagamentoEnum formaPagamento,
 		SituacaoPedidoEnum situacao
 ) {
@@ -34,14 +32,13 @@ public record DadosListagemPedido(
 				pedido.getValor(),
 				pedido.getDesconto(),
 				pedido.getValorTotal(),
-				pedido.hasPendenciaAtivaBySituacao(SituacaoListaPendenciaEnum.PENDENTE),
+				pedido.hasPendenciaAtivaBySituacao(SituacaoListaPendenciaEnum.PENDENTE) ?
+						String.valueOf(pedido.getTotalPendencias()) :
+						"Não",
 				pedido.getPedidoLivro().stream().mapToLong(PedidoLivro::getQuantidade).sum(),
-				pedido.getPedidoLivro().stream().mapToLong(PedidoLivro::getQuantidadeEntregue).sum(),
 				pedido.getPedidoKitLivro().stream().mapToLong(PedidoKitLivro::getQuantidade).sum(),
-				pedido.getPedidoKitLivro().stream().mapToLong(PedidoKitLivro::getQuantidadeEntregue).sum(),
 				pedido.getFormaPagamento(),
 				pedido.getSituacaoPedido()
-
 		);
 	}
 }

@@ -12,7 +12,7 @@ public record DadosListagemListaPendencia(
         Long pedidoId,
         String nomeCliente,
         Long quantidadeLivros,
-        Long quantidadeLivrosEntregue,
+        Long quantidadeLivrosEntregues,
         Long quantidadeKitLivros,
         Long quantidadeKitLivrosEntregues,
         SituacaoListaPendenciaEnum situacao,
