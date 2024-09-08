@@ -11,4 +11,6 @@ public interface SerieRepository extends JpaRepository<Serie,Long> {
 	Boolean existsByIdAndAtivoTrue(Long id);
 
 	Page<Serie> findAllByAtivoTrue(Pageable page);
+
+	Page<Serie> findAllByAtivoTrueAndNomeContaining(Pageable page, String nome);
 }
