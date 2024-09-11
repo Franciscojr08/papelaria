@@ -7,6 +7,7 @@ import papelaria.ideal.api.aluno.records.DadosAtualizacaoAluno;
 import papelaria.ideal.api.aluno.records.DadosCadastroAluno;
 import papelaria.ideal.api.cliente.ClienteRepository;
 import papelaria.ideal.api.errors.ValidacaoException;
+import papelaria.ideal.api.utils.Functions;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -32,15 +33,15 @@ public class AlunoService {
 		var aluno = new Aluno();
 		aluno.setNome(dados.nome());
 
-		if (dados.matricula() != null) {
+		if (Functions.isNotBlank(dados.matricula())) {
 			aluno.setMatricula(dados.matricula().replaceAll("[.-]", ""));
 		}
 
-		if (dados.rg() != null) {
+		if (Functions.isNotBlank(dados.rg())) {
 			aluno.setRg(dados.rg().replaceAll("[.-]", ""));
 		}
 
-		if (dados.cpf() != null) {
+		if (Functions.isNotBlank(dados.cpf())) {
 			aluno.setCpf(dados.cpf().replaceAll("[.-]", ""));
 		}
 
@@ -65,14 +66,14 @@ public class AlunoService {
 			);
 		}
 
-        if (dados.cpf() == null && dados.rg() == null && dados.matricula() == null) {
+        if (Functions.isBlank(dados.cpf()) && Functions.isBlank(dados.rg()) && Functions.isBlank(dados.matricula())) {
             throw new ValidacaoException(
                     "Não foi possível cadastrar o aluno. É necessário informar algum campo de identificação: " +
                             "RG, Matrícula ou CPF."
             );
         }
 
-        if (dados.matricula() != null &&
+        if (Functions.isNotBlank(dados.matricula()) &&
 		        alunoRepository.existsByMatriculaAndAtivoTrue(dados.matricula().replaceAll("[.-]", ""))
         ) {
             throw new ValidacaoException(
@@ -80,7 +81,7 @@ public class AlunoService {
             );
         }
 
-        if (dados.rg() != null &&
+        if (Functions.isNotBlank(dados.rg()) &&
 		        alunoRepository.existsByRgAndAtivoTrue(dados.rg().replaceAll("[.-]", ""))
         ) {
             throw new ValidacaoException(
@@ -88,7 +89,7 @@ public class AlunoService {
             );
         }
 
-        if (dados.cpf() != null &&
+        if (Functions.isNotBlank(dados.cpf()) &&
 		        alunoRepository.existsByCpfAndAtivoTrue(dados.cpf().replaceAll("[.-]", ""))
         ) {
             throw new ValidacaoException(
@@ -110,14 +111,14 @@ public class AlunoService {
 			);
 		}
 
-		if (dados.cpf() == null && dados.rg() == null && dados.matricula() == null) {
+		if (Functions.isBlank(dados.cpf()) && Functions.isBlank(dados.rg()) && Functions.isBlank(dados.matricula())) {
 			throw new ValidacaoException(
 					"Não foi possível atualizar o aluno. É necessário informar algum campo de identificação: " +
 							"RG, Matrícula ou CPF."
 			);
 		}
 
-		if (dados.matricula() != null &&
+		if (Functions.isNotBlank(dados.matricula()) &&
 				!Objects.equals(aluno.getMatricula(), dados.matricula().replaceAll("[.-]", "")) &&
 				alunoRepository.existsByMatriculaAndAtivoTrue(dados.matricula().replaceAll("[.-]", ""))
 		) {
@@ -126,7 +127,7 @@ public class AlunoService {
 			);
 		}
 
-		if (dados.rg() != null &&
+		if (Functions.isNotBlank(dados.rg()) &&
 				!Objects.equals(aluno.getRg(), dados.rg().replaceAll("[.-]", "")) &&
 				alunoRepository.existsByRgAndAtivoTrue(dados.rg().replaceAll("[.-]", ""))
 		) {
@@ -135,7 +136,7 @@ public class AlunoService {
 			);
 		}
 
-		if (dados.cpf() != null &&
+		if (Functions.isNotBlank(dados.cpf()) &&
 				!Objects.equals(aluno.getCpf(), dados.cpf().replaceAll("[.-]", "")) &&
 				alunoRepository.existsByCpfAndAtivoTrue(dados.cpf().replaceAll("[.-]", ""))
 		) {
@@ -148,28 +149,28 @@ public class AlunoService {
     public void atualizarInformacoes(Aluno aluno, DadosAtualizacaoAluno dados) {
         validarIntegridadeAtualizacao(aluno,dados);
 
-	    if (dados.nome() != null) {
+	    if (Functions.isNotBlank(dados.nome())) {
 		    aluno.setNome(dados.nome());
 	    }
 
-	    if (dados.matricula() != null) {
+	    if (Functions.isNotBlank(dados.matricula())) {
 		    aluno.setMatricula(dados.matricula().replaceAll("[.-]", ""));
 	    }
 
-	    if (dados.rg() != null) {
+	    if (Functions.isNotBlank(dados.rg())) {
 		    aluno.setRg(dados.rg().replaceAll("[.-]", ""));
 	    }
 
-	    if (dados.cpf() != null) {
+	    if (Functions.isNotBlank(dados.cpf())) {
 		    aluno.setCpf(dados.cpf().replaceAll("[.-]", ""));
 	    }
 
-	    if (dados.clienteResponsavelId() != null) {
+	    if (Functions.isNotBlankLong(dados.clienteResponsavelId())) {
 		    var cliente = clienteRepository.getReferenceById(dados.clienteResponsavelId());
 		    aluno.setCliente(cliente);
 	    }
 
-		if (dados.turmaId() != null) {
+		if (Functions.isNotBlankLong(dados.turmaId())) {
 			var turma = turmaRepository.getReferenceById(dados.turmaId());
 			aluno.setTurma(turma);
 		}

@@ -17,6 +17,7 @@ import papelaria.ideal.api.errors.ValidacaoException;
 
 import java.time.LocalDateTime;
 
+@CrossOrigin(origins = "http://localhost:4200")
 @RestController
 @RequestMapping("/turma")
 public class TurmaController {
@@ -54,6 +55,16 @@ public class TurmaController {
 		}
 
 		return ResponseEntity.ok().body(new DadosDetalhamentoTurma(turmaRepository.getReferenceById(id)));
+	}
+
+	@GetMapping("/listar-por-serie/{serieId}")
+	public ResponseEntity<Page<DadosListagemTurma>> listarPorSerie(
+			@PathVariable Long serieId,
+			Pageable pageable
+	) {
+		var page = turmaRepository.findBySerieId(serieId, pageable).map(DadosListagemTurma::new);
+
+		return ResponseEntity.ok().body(page);
 	}
 
 	@PutMapping

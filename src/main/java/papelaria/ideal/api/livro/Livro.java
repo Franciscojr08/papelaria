@@ -116,4 +116,8 @@ public class Livro {
 
 		return dadosListagemListaPendencias;
 	}
+
+	public String getDescricaoUsoInterno() {
+		return this.usoInterno ? "Sim" : "Não";
+	}
 }

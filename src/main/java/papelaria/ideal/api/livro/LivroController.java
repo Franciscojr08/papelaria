@@ -14,9 +14,11 @@ import papelaria.ideal.api.livro.records.DadosAtualizacaoLivro;
 import papelaria.ideal.api.livro.records.DadosCadastroLivro;
 import papelaria.ideal.api.livro.records.DadosDetalhamentoLivro;
 import papelaria.ideal.api.livro.records.DadosListagemLivro;
+import papelaria.ideal.api.pedido.records.DadosListagemPedido;
 
 import java.time.LocalDateTime;
 
+@CrossOrigin(origins = "http://localhost:4200")
 @RestController
 @RequestMapping("/livro")
 public class LivroController {
@@ -55,6 +57,15 @@ public class LivroController {
 		}
 
 		return ResponseEntity.ok().body(new DadosDetalhamentoLivro(livroRepository.getReferenceById(id)));
+	}
+
+	@GetMapping("/listar-por-serie/{serieId}")
+	public ResponseEntity<Page<DadosListagemLivro>> listarPorSerie(
+			@PathVariable Long serieId,
+			Pageable pageable
+	) {
+		var livros = livroRepository.findBySerieId(serieId,pageable).map(DadosListagemLivro::new);
+		return ResponseEntity.ok(livros);
 	}
 
 	@PutMapping
