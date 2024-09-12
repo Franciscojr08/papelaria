@@ -4,11 +4,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import papelaria.ideal.api.Serie.records.DadosAtualizacaoSerie;
 import papelaria.ideal.api.Serie.records.DadosCadastroSerie;
+import papelaria.ideal.api.Serie.records.DadosComboSerie;
 import papelaria.ideal.api.Turma.Turma;
 import papelaria.ideal.api.errors.ValidacaoException;
 import papelaria.ideal.api.livro.Livro;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Objects;
 
 @Service
@@ -62,5 +64,10 @@ public class SerieService {
 
 		serie.setAtivo(false);
 		serie.setDataAtualizacao(LocalDateTime.now());
+	}
+
+	public List<DadosComboSerie> montarCombo() {
+		var series = serieRepository.findAllByAtivoTrue();
+		return series.stream().map(DadosComboSerie::new).toList();
 	}
 }

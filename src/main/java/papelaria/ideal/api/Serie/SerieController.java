@@ -8,14 +8,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import papelaria.ideal.api.Serie.records.DadosAtualizacaoSerie;
-import papelaria.ideal.api.Serie.records.DadosCadastroSerie;
-import papelaria.ideal.api.Serie.records.DadosDetalhamentoSerie;
-import papelaria.ideal.api.Serie.records.DadosListagemSerie;
+import papelaria.ideal.api.Serie.records.*;
 import papelaria.ideal.api.errors.DadosResponse;
 import papelaria.ideal.api.errors.ValidacaoException;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @CrossOrigin(origins = "http://localhost:4200")
 @RestController
@@ -46,6 +44,13 @@ public class SerieController {
 		var page = serieRepository.findAllByAtivoTrue(paginacao).map(DadosListagemSerie::new);
 
 		return ResponseEntity.ok().body(page);
+	}
+
+	@GetMapping("/combo")
+	public ResponseEntity<List<DadosComboSerie>> combo() {
+		var combo = serieService.montarCombo();
+
+		return ResponseEntity.ok().body(combo);
 	}
 
 	@GetMapping("/filtrar")
