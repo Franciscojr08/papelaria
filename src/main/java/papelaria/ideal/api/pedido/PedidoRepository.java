@@ -11,6 +11,6 @@ public interface PedidoRepository extends JpaRepository<Pedido,Long> {
 
 	Boolean existsByIdAndAtivoTrue(Long id);
 
-	@Query("SELECT p FROM pedido p JOIN p.pedidoKitLivro pk WHERE pk.kitLivro.id = :kitLivroId")
-	Page<Pedido> findByKitLivroId(Long kitLivroId, Pageable pageable);
+	@Query("SELECT p FROM pedido p JOIN p.pedidoKitLivro pk WHERE pk.kitLivro.id = :kitLivroId and p.ativo = true ")
+	Page<Pedido> findByAtivoTrueAndKitLivroId(Long kitLivroId, Pageable pageable);
 }

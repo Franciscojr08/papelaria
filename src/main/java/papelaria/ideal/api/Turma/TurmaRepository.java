@@ -15,6 +15,6 @@ public interface TurmaRepository extends JpaRepository<Turma,Long> {
 
 	Boolean existsByIdAndAtivoTrue(Long id);
 
-	@Query("SELECT t FROM turma t INNER JOIN t.serie ts WHERE ts.id = :serieId")
+	@Query("SELECT t FROM turma t INNER JOIN t.serie ts WHERE ts.id = :serieId and t.ativo = true")
 	Page<Turma> findBySerieId(Long serieId, Pageable pageable);
 }

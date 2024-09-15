@@ -17,6 +17,7 @@ import papelaria.ideal.api.errors.ValidacaoException;
 
 import java.time.LocalDateTime;
 
+@CrossOrigin(origins = "http://localhost:4200")
 @RestController
 @RequestMapping("/aluno")
 public class AlunoController {
@@ -44,6 +45,16 @@ public class AlunoController {
     @GetMapping
     public ResponseEntity<Page<DadosListagemAluno>> listar(Pageable paginacao) {
         var page = alunoRepository.findAllByAtivoTrue(paginacao).map(DadosListagemAluno::new);
+
+        return ResponseEntity.ok().body(page);
+    }
+
+    @GetMapping("/listar-por-turma/{turmaId}")
+    public ResponseEntity<Page<DadosListagemAluno>> filtrar(
+            @PathVariable Long turmaId,
+            Pageable pageable
+    ) {
+        var page = alunoRepository.findAllByAtivoTrueAndTurmaId(turmaId, pageable).map(DadosListagemAluno::new);
 
         return ResponseEntity.ok().body(page);
     }

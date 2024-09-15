@@ -300,7 +300,7 @@ public class PedidoService {
 	}
 
 	public Page<DadosListagemPedido> listarPedidosPorKitLivro(Long kitLivroId, Pageable pageable) {
-		return pedidoRepository.findByKitLivroId(kitLivroId, pageable)
+		return pedidoRepository.findByAtivoTrueAndKitLivroId(kitLivroId, pageable)
 				.map(DadosListagemPedido::new);
 	}
 }

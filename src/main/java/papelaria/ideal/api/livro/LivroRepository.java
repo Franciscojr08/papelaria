@@ -13,6 +13,6 @@ public interface LivroRepository extends JpaRepository<Livro,Long> {
 
 	Page<Livro> findAllByAtivoTrue(Pageable page);
 
-	@Query("SELECT l FROM livro l INNER JOIN l.serie ls WHERE ls.id = :serieId")
+	@Query("SELECT l FROM livro l INNER JOIN l.serie ls WHERE ls.id = :serieId and l.ativo = true")
 	Page<Livro> findBySerieId(Long serieId, Pageable pageable);
 }
