@@ -8,10 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import papelaria.ideal.api.Turma.records.DadosAtualizacaoTurma;
-import papelaria.ideal.api.Turma.records.DadosCadastroTurma;
-import papelaria.ideal.api.Turma.records.DadosDetalhamentoTurma;
-import papelaria.ideal.api.Turma.records.DadosListagemTurma;
+import papelaria.ideal.api.Turma.records.*;
 import papelaria.ideal.api.errors.DadosResponse;
 import papelaria.ideal.api.errors.ValidacaoException;
 
@@ -56,6 +53,19 @@ public class TurmaController {
 
 		return ResponseEntity.ok().body(new DadosDetalhamentoTurma(turmaRepository.getReferenceById(id)));
 	}
+
+	@GetMapping("/filtrar")
+	public ResponseEntity<Page<DadosListagemTurma>> filtrar(
+			Pageable paginacao,
+			@RequestParam(required = false) String nome,
+			@RequestParam(required = false) Long serieId
+	) {
+		var filtros = new DadosFiltragemTurma(nome,serieId);
+		var page = turmaService.filtrar(filtros,paginacao).map(DadosListagemTurma::new);
+
+		return ResponseEntity.ok().body(page);
+	}
+
 
 	@GetMapping("/listar-por-serie/{serieId}")
 	public ResponseEntity<Page<DadosListagemTurma>> listarPorSerie(

@@ -14,4 +14,8 @@ public class Functions {
 	public static boolean isNotBlankLong(Long value) {
 		return value != null;
 	}
+
+	public static boolean isNotBlankFloat(Float value) {
+		return value != null;
+	}
 }

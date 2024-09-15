@@ -1,10 +1,16 @@
 package papelaria.ideal.api.Turma;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import papelaria.ideal.api.Serie.SerieRepository;
 import papelaria.ideal.api.Turma.records.DadosAtualizacaoTurma;
 import papelaria.ideal.api.Turma.records.DadosCadastroTurma;
+import papelaria.ideal.api.Turma.records.DadosFiltragemTurma;
+import papelaria.ideal.api.Turma.records.TurmaQueryNative;
 import papelaria.ideal.api.aluno.Aluno;
 import papelaria.ideal.api.errors.ValidacaoException;
 
@@ -18,6 +24,8 @@ public class TurmaService {
 	private TurmaRepository turmaRepository;
 	@Autowired
 	private SerieRepository serieRepository;
+	@PersistenceContext
+	private EntityManager entityManager;
 
 	public void cadastrar(DadosCadastroTurma dados) {
 		validarIntegridade(dados.nome(), dados.serieId());
@@ -89,5 +97,10 @@ public class TurmaService {
 
 		turma.setAtivo(false);
 		turma.setDataAtualizacao(LocalDateTime.now());
+	}
+
+	public Page<Turma> filtrar(DadosFiltragemTurma filtros, Pageable paginacao) {
+		var turmaQueryNativo = new TurmaQueryNative(entityManager);
+		return turmaQueryNativo.filtrarTurmas(filtros,paginacao);
 	}
 }

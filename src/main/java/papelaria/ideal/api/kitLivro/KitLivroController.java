@@ -53,7 +53,6 @@ public class KitLivroController {
 			@RequestParam(required = false) Long quantidadeDisponivel
 	) {
 		var filtros = new DadosFiltragemKitLivro(nome,valor,quantidadeDisponivel);
-
 		var page = kitLivroService.filtrar(filtros, pageable).map(DadosListagemKitLivro::new);
 
 		return ResponseEntity.ok().body(page);
