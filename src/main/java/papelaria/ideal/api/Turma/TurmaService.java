@@ -10,7 +10,6 @@ import papelaria.ideal.api.Serie.SerieRepository;
 import papelaria.ideal.api.Turma.records.DadosAtualizacaoTurma;
 import papelaria.ideal.api.Turma.records.DadosCadastroTurma;
 import papelaria.ideal.api.Turma.records.DadosFiltragemTurma;
-import papelaria.ideal.api.Turma.records.TurmaQueryNative;
 import papelaria.ideal.api.aluno.Aluno;
 import papelaria.ideal.api.errors.ValidacaoException;
 

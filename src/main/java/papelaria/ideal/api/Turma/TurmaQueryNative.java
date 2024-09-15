@@ -1,4 +1,4 @@
-package papelaria.ideal.api.Turma.records;
+package papelaria.ideal.api.Turma;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import papelaria.ideal.api.Turma.Turma;
+import papelaria.ideal.api.Turma.records.DadosFiltragemTurma;
 import papelaria.ideal.api.kitLivro.KitLivro;
 import papelaria.ideal.api.utils.Functions;
 
