@@ -51,17 +51,17 @@ public class TratarErros {
 		return ResponseEntity.badRequest().body(dadosResponse);
 	}
 
-	@ExceptionHandler(Exception.class)
-	public ResponseEntity<DadosResponse> tratarErro500(Exception exp) {
-		var dadosResponse = new DadosResponse(
-				LocalDateTime.now(),
-				"Internal Server Error",
-				HttpStatus.INTERNAL_SERVER_ERROR.value(),
-				"Ocorreu um erro interno no sistema!"
-		);
-
-		return ResponseEntity.internalServerError().body(dadosResponse);
-	}
+//	@ExceptionHandler(Exception.class)
+//	public ResponseEntity<DadosResponse> tratarErro500(Exception exp) {
+//		var dadosResponse = new DadosResponse(
+//				LocalDateTime.now(),
+//				"Internal Server Error",
+//				HttpStatus.INTERNAL_SERVER_ERROR.value(),
+//				"Ocorreu um erro interno no sistema!"
+//		);
+//
+//		return ResponseEntity.internalServerError().body(dadosResponse);
+//	}
 
 	@ExceptionHandler(ValidacaoException.class)
 	public ResponseEntity<DadosResponse> tratarErroRegraDeNegocio(ValidacaoException ex) {

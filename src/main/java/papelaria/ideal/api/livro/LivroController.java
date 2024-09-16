@@ -10,10 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import papelaria.ideal.api.errors.DadosResponse;
 import papelaria.ideal.api.errors.ValidacaoException;
-import papelaria.ideal.api.livro.records.DadosAtualizacaoLivro;
-import papelaria.ideal.api.livro.records.DadosCadastroLivro;
-import papelaria.ideal.api.livro.records.DadosDetalhamentoLivro;
-import papelaria.ideal.api.livro.records.DadosListagemLivro;
+import papelaria.ideal.api.livro.records.*;
 import papelaria.ideal.api.pedido.records.DadosListagemPedido;
 
 import java.time.LocalDateTime;
@@ -46,6 +43,22 @@ public class LivroController {
 	@GetMapping
 	public ResponseEntity<Page<DadosListagemLivro>> listar(Pageable paginacao) {
 		var page = livroRepository.findAllByAtivoTrue(paginacao).map(DadosListagemLivro::new);
+
+		return ResponseEntity.ok().body(page);
+	}
+
+	@GetMapping("/filtrar")
+	public ResponseEntity<Page<DadosListagemLivro>> filtrar(
+			Pageable pageable,
+			@RequestParam(required = false) String identificador,
+			@RequestParam(required = false) String nome,
+			@RequestParam(required = false) Long quantidadeDisponivel,
+			@RequestParam(required = false) Long serieId,
+			@RequestParam(required = false) Boolean usoInterno,
+			@RequestParam(required = false) Float valor
+	) {
+		var filtros = new DadosFiltragemLivro(identificador, nome, quantidadeDisponivel, serieId, usoInterno, valor);
+		var page = livroService.filtrar(filtros,pageable).map(DadosListagemLivro::new);
 
 		return ResponseEntity.ok().body(page);
 	}

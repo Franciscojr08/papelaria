@@ -1,12 +1,19 @@
 package papelaria.ideal.api.livro;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Range;
 import org.springframework.stereotype.Service;
 import papelaria.ideal.api.Serie.SerieRepository;
 import papelaria.ideal.api.errors.ValidacaoException;
+import papelaria.ideal.api.kitLivro.KitLivroQueryNative;
 import papelaria.ideal.api.livro.records.DadosAtualizacaoLivro;
 import papelaria.ideal.api.livro.records.DadosCadastroLivro;
+import papelaria.ideal.api.livro.records.DadosFiltragemLivro;
 import papelaria.ideal.api.pedido.Pedido;
 import papelaria.ideal.api.pedido.SituacaoPedidoEnum;
 import papelaria.ideal.api.pedido.livro.PedidoLivro;
@@ -23,6 +30,8 @@ public class LivroService implements LivroKitLivroServiceInterface {
 	private LivroRepository livroRepository;
 	@Autowired
 	private SerieRepository serieRepository;
+	@PersistenceContext
+	private EntityManager entityManager;
 
 	@Transactional
 	public void atualizarQuantidade(Long id, Long quantidade) {
@@ -158,5 +167,10 @@ public class LivroService implements LivroKitLivroServiceInterface {
 
 		livro.setAtivo(false);
 		livro.setDataAtualizacao(LocalDateTime.now());
+	}
+
+	public Page<Livro> filtrar(DadosFiltragemLivro filtros, Pageable pageable) {
+		var livroQueryNative = new LivroQueryNative(entityManager);
+		return livroQueryNative.filtrarLivros(filtros, pageable);
 	}
 }
