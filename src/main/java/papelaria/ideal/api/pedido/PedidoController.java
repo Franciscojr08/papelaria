@@ -55,12 +55,22 @@ public class PedidoController {
 	}
 
 	@GetMapping("/listar-por-kit/{kitLivroId}")
-	public ResponseEntity<Page<DadosListagemPedido>> listarPedidosPorKitLivro(
+	public ResponseEntity<Page<DadosListagemPedido>> listarPorKitLivro(
 			@PathVariable Long kitLivroId,
 			Pageable pageable
 	) {
 		Page<DadosListagemPedido> pedidos = pedidoService.listarPedidosPorKitLivro(kitLivroId, pageable);
 		return ResponseEntity.ok(pedidos);
+	}
+
+	@GetMapping("listar-por-livro/{livroId}")
+	public ResponseEntity<Page<DadosListagemPedido>> listarPorLivro(
+			@PathVariable Long livroId,
+			Pageable pageable
+	) {
+		var page = pedidoRepository.findByLivroIdAndAtivoTrue(livroId,pageable).map(DadosListagemPedido::new);
+
+		return ResponseEntity.ok().body(page);
 	}
 
 	@PutMapping

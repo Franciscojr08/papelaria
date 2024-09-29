@@ -98,7 +98,7 @@ public class LivroService implements LivroKitLivroServiceInterface {
 			);
 		}
 
-		if (dados.serieId() != null &&
+		if (dados.serieId() != null && livro.getSerie() != null &&
 				!Objects.equals(livro.getSerie().getId(), dados.serieId()) &&
 				!serieRepository.existsByIdAndAtivoTrue(dados.serieId())
 		) {
@@ -142,6 +142,10 @@ public class LivroService implements LivroKitLivroServiceInterface {
 		if (dados.serieId() != null) {
 			var serie = serieRepository.getReferenceById(dados.serieId());
 			livro.setSerie(serie);
+		}
+
+		if (dados.serieId() == null && livro.getSerie() != null) {
+			livro.setSerie(null);
 		}
 
 		livro.setDataAtualizacao(LocalDateTime.now());

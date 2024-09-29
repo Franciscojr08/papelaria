@@ -11,6 +11,9 @@ public interface ListaPendenciaRepository extends JpaRepository<ListaPendencia, 
 
     Boolean existsByIdAndAtivoTrue(Long id);
 
-    @Query("SELECT l from lista_pendencia l JOIN l.listaPendenciaKitLivro lk WHERE lk.kitLivro.id = :kitLivroId")
-    Page<ListaPendencia> findByKitLivroId(Long kitLivroId, Pageable pageable);
+    @Query("SELECT l FROM lista_pendencia l JOIN l.listaPendenciaKitLivro lk WHERE lk.kitLivro.id = :kitLivroId and l.ativo = true")
+    Page<ListaPendencia> findByKitLivroIdAndAtivoTrue(Long kitLivroId, Pageable pageable);
+
+    @Query("SELECT l FROM lista_pendencia  l JOIN l.listaPendenciaLivro ll WHERE ll.livro.id = :livroId and l.ativo = true")
+    Page<ListaPendencia> findByLivroIdAndAtivoTrue(Long livroId, Pageable pageable);
 }

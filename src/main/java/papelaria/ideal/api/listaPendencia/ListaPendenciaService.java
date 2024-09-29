@@ -277,7 +277,7 @@ public class ListaPendenciaService {
 	}
 
 	public Page<DadosListagemListaPendencia> listarPedidosPorKitLivro(Long kitLivroId, Pageable pageable) {
-		return listaPendenciaRepository.findByKitLivroId(kitLivroId, pageable)
+		return listaPendenciaRepository.findByKitLivroIdAndAtivoTrue(kitLivroId, pageable)
 				.map(DadosListagemListaPendencia::new);
 	}
 }

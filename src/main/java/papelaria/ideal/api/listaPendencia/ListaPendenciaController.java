@@ -45,7 +45,7 @@ public class ListaPendenciaController {
     }
 
     @GetMapping("/listar-por-kit/{kitLivroId}")
-    public ResponseEntity<Page<DadosListagemListaPendencia>> listarPedidosPorKitLivro(
+    public ResponseEntity<Page<DadosListagemListaPendencia>> listarPorKitLivro(
             @PathVariable Long kitLivroId,
             Pageable pageable
     ) {
@@ -54,6 +54,16 @@ public class ListaPendenciaController {
                 pageable
         );
         return ResponseEntity.ok(listaPendencia);
+    }
+
+    @GetMapping("listar-por-livro/{livroId}")
+    public ResponseEntity<Page<DadosListagemListaPendencia>> listarPorLivro(
+            @PathVariable Long livroId,
+            Pageable pageable
+    ) {
+        var page = listaPendenciaRepository.findByLivroIdAndAtivoTrue(livroId,pageable).map(DadosListagemListaPendencia::new);
+
+        return ResponseEntity.ok(page);
     }
 
     @PutMapping
