@@ -1,10 +1,15 @@
 package papelaria.ideal.api.cliente;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import papelaria.ideal.api.aluno.Aluno;
 import papelaria.ideal.api.cliente.records.DadosAtualizacaoCliente;
 import papelaria.ideal.api.cliente.records.DadosCadastroCliente;
+import papelaria.ideal.api.cliente.records.DadosFiltragemCliente;
 import papelaria.ideal.api.endereco.Endereco;
 import papelaria.ideal.api.errors.ValidacaoException;
 import papelaria.ideal.api.pedido.Pedido;
@@ -18,6 +23,8 @@ public class ClienteService {
 
     @Autowired
     private ClienteRepository clienteRepository;
+    @PersistenceContext
+    private EntityManager entityManager;
 
     public void cadastrar(DadosCadastroCliente dados) {
         validarIntegridade(dados.cpf());
@@ -103,5 +110,10 @@ public class ClienteService {
 
         cliente.setDataAtualizacao(LocalDateTime.now());
         cliente.setAtivo(false);
+    }
+
+    public Page<Cliente> filtrar(DadosFiltragemCliente filtros, Pageable pageable) {
+        var clienteQueryNative = new ClienteQueryNative(entityManager);
+        return clienteQueryNative.filtrarClientes(filtros,pageable);
     }
 }

@@ -8,15 +8,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import papelaria.ideal.api.cliente.records.DadosAtualizacaoCliente;
-import papelaria.ideal.api.cliente.records.DadosCadastroCliente;
-import papelaria.ideal.api.cliente.records.DadosDetalhamentoCliente;
-import papelaria.ideal.api.cliente.records.DadosListagemCliente;
+import papelaria.ideal.api.cliente.records.*;
 import papelaria.ideal.api.errors.DadosResponse;
 import papelaria.ideal.api.errors.ValidacaoException;
 
 import java.time.LocalDateTime;
 
+@CrossOrigin(origins = "http://localhost:4200")
 @RestController
 @RequestMapping("/cliente")
 public class ClienteController {
@@ -54,6 +52,20 @@ public class ClienteController {
         }
 
         return ResponseEntity.ok().body(new DadosDetalhamentoCliente(clienteRepository.getReferenceById(id)));
+    }
+
+    @GetMapping("/filtrar")
+    public ResponseEntity<Page<DadosListagemCliente>> filtrar(
+            Pageable pageable,
+            @RequestParam(required = false) String nome,
+            @RequestParam(required = false) String email,
+            @RequestParam(required = false) String cpf,
+            @RequestParam(required = false) Boolean responsavel
+    ) {
+        var filtros = new DadosFiltragemCliente(nome, email, cpf, responsavel);
+        var page = clienteService.filtrar(filtros,pageable).map(DadosListagemCliente::new);
+
+        return ResponseEntity.ok().body(page);
     }
 
     @PutMapping

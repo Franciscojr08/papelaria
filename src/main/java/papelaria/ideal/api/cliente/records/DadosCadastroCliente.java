@@ -18,7 +18,6 @@ public record DadosCadastroCliente(
         @Valid
         DadosEndereco endereco,
         @NotNull
-
         Boolean responsavelAluno
 ) {
 }
