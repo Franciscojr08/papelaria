@@ -50,11 +50,21 @@ public class AlunoController {
     }
 
     @GetMapping("/listar-por-turma/{turmaId}")
-    public ResponseEntity<Page<DadosListagemAluno>> filtrar(
+    public ResponseEntity<Page<DadosListagemAluno>> listarPorTurma(
             @PathVariable Long turmaId,
             Pageable pageable
     ) {
         var page = alunoRepository.findAllByAtivoTrueAndTurmaId(turmaId, pageable).map(DadosListagemAluno::new);
+
+        return ResponseEntity.ok().body(page);
+    }
+
+    @GetMapping("/listar-por-cliente/{clienteId}")
+    public ResponseEntity<Page<DadosListagemAluno>> listarPorCliente(
+            @PathVariable Long clienteId,
+            Pageable pageable
+    ) {
+        var page = alunoRepository.findAllByAtivoTrueAndClienteId(clienteId, pageable).map(DadosListagemAluno::new);
 
         return ResponseEntity.ok().body(page);
     }

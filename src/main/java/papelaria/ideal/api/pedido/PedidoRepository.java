@@ -16,4 +16,7 @@ public interface PedidoRepository extends JpaRepository<Pedido,Long> {
 
 	@Query("SELECT p FROM pedido p JOIN p.pedidoLivro pl WHERE pl.livro.id = :livroId and p.ativo = true")
 	Page<Pedido> findByLivroIdAndAtivoTrue(Long livroId, Pageable pageable);
+
+	@Query("SELECT p FROM pedido p INNER JOIN p.cliente pc WHERE pc.id = :clienteId and p.ativo = true")
+	Page<Pedido> findAllByAtivoTrueAndClienteId(Long clienteId, Pageable pageable);
 }

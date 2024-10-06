@@ -73,6 +73,16 @@ public class PedidoController {
 		return ResponseEntity.ok().body(page);
 	}
 
+	@GetMapping("/listar-por-cliente/{clienteId}")
+	public ResponseEntity<Page<DadosListagemPedido>> listarPorCliente(
+			@PathVariable Long clienteId,
+			Pageable pageable
+	) {
+		var page = pedidoRepository.findAllByAtivoTrueAndClienteId(clienteId, pageable).map(DadosListagemPedido::new);
+
+		return ResponseEntity.ok().body(page);
+	}
+
 	@PutMapping
 	@Transactional
 	public ResponseEntity<DadosDetalhamentoPedido> atualizar(@RequestBody @Valid DadosAtualizacaoPedido dados) {

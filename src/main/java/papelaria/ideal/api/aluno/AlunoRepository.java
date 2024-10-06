@@ -21,4 +21,7 @@ public interface AlunoRepository extends JpaRepository<Aluno, Long> {
 
     @Query("SELECT a FROM aluno a INNER JOIN a.turma at WHERE at.id = :turmaId and a.ativo = true")
     Page<Aluno> findAllByAtivoTrueAndTurmaId(Long turmaId, Pageable pageable);
+
+    @Query("SELECT a FROM aluno a INNER JOIN a.cliente ac WHERE ac.id = :clienteId and a.ativo = true")
+    Page<Aluno> findAllByAtivoTrueAndClienteId(Long clienteId, Pageable pageable);
 }
