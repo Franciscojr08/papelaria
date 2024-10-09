@@ -8,10 +8,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import papelaria.ideal.api.aluno.records.DadosDetalhamentoAluno;
-import papelaria.ideal.api.aluno.records.DadosListagemAluno;
-import papelaria.ideal.api.aluno.records.DadosAtualizacaoAluno;
-import papelaria.ideal.api.aluno.records.DadosCadastroAluno;
+import papelaria.ideal.api.Serie.records.DadosComboSerie;
+import papelaria.ideal.api.aluno.records.*;
 import papelaria.ideal.api.errors.DadosResponse;
 import papelaria.ideal.api.errors.ValidacaoException;
 
@@ -67,6 +65,22 @@ public class AlunoController {
         var page = alunoRepository.findAllByAtivoTrueAndClienteId(clienteId, pageable).map(DadosListagemAluno::new);
 
         return ResponseEntity.ok().body(page);
+    }
+
+    @GetMapping("/filtrar")
+    public ResponseEntity<Page<DadosListagemAluno>> filtrar(
+            Pageable pageable,
+            @RequestParam(required = false) String nome,
+            @RequestParam(required = false) String matricula,
+            @RequestParam(required = false) String cpf,
+            @RequestParam(required = false) String rg,
+            @RequestParam(required = false) Long clienteId,
+            @RequestParam(required = false) Long turmaId
+    ) {
+        var dadosFiltrs = new DadosFiltragemAluno(nome, matricula, cpf, rg, clienteId, turmaId);
+        var page = alunoService.filtrar(dadosFiltrs,pageable).map(DadosListagemAluno::new);
+
+        return ResponseEntity.ok(page);
     }
 
     @GetMapping("/{id}")

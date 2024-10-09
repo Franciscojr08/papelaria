@@ -9,11 +9,13 @@ import org.springframework.stereotype.Service;
 import papelaria.ideal.api.Serie.SerieRepository;
 import papelaria.ideal.api.Turma.records.DadosAtualizacaoTurma;
 import papelaria.ideal.api.Turma.records.DadosCadastroTurma;
+import papelaria.ideal.api.Turma.records.DadosComboTurma;
 import papelaria.ideal.api.Turma.records.DadosFiltragemTurma;
 import papelaria.ideal.api.aluno.Aluno;
 import papelaria.ideal.api.errors.ValidacaoException;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Objects;
 
 @Service
@@ -101,5 +103,10 @@ public class TurmaService {
 	public Page<Turma> filtrar(DadosFiltragemTurma filtros, Pageable paginacao) {
 		var turmaQueryNativo = new TurmaQueryNative(entityManager);
 		return turmaQueryNativo.filtrarTurmas(filtros,paginacao);
+	}
+
+	public List<DadosComboTurma> montarCombo() {
+		var turmas = turmaRepository.findAllByAtivoTrue();
+		return turmas.stream().map(DadosComboTurma::new).toList();
 	}
 }

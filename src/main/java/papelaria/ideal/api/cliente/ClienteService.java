@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import papelaria.ideal.api.aluno.Aluno;
 import papelaria.ideal.api.cliente.records.DadosAtualizacaoCliente;
 import papelaria.ideal.api.cliente.records.DadosCadastroCliente;
+import papelaria.ideal.api.cliente.records.DadosComboCliente;
 import papelaria.ideal.api.cliente.records.DadosFiltragemCliente;
 import papelaria.ideal.api.endereco.Endereco;
 import papelaria.ideal.api.errors.ValidacaoException;
@@ -16,6 +17,7 @@ import papelaria.ideal.api.pedido.Pedido;
 import papelaria.ideal.api.pedido.SituacaoPedidoEnum;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Objects;
 
 @Service
@@ -115,5 +117,10 @@ public class ClienteService {
     public Page<Cliente> filtrar(DadosFiltragemCliente filtros, Pageable pageable) {
         var clienteQueryNative = new ClienteQueryNative(entityManager);
         return clienteQueryNative.filtrarClientes(filtros,pageable);
+    }
+
+	public List<DadosComboCliente> montarCombo() {
+        var clientes = clienteRepository.findAllByAtivoTrue();
+        return clientes.stream().map(DadosComboCliente::new).toList();
     }
 }

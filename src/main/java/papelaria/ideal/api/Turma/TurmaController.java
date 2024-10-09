@@ -13,6 +13,7 @@ import papelaria.ideal.api.errors.DadosResponse;
 import papelaria.ideal.api.errors.ValidacaoException;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @CrossOrigin(origins = "http://localhost:4200")
 @RestController
@@ -43,6 +44,13 @@ public class TurmaController {
 		var page = turmaRepository.findAllByAtivoTrue(paginacao).map(DadosListagemTurma::new);
 
 		return ResponseEntity.ok().body(page);
+	}
+
+	@GetMapping("/combo")
+	public ResponseEntity<List<DadosComboTurma>> combo() {
+		var combo = turmaService.montarCombo();
+
+		return ResponseEntity.ok(combo);
 	}
 
 	@GetMapping("/{id}")

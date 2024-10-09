@@ -1,10 +1,15 @@
 package papelaria.ideal.api.aluno;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import papelaria.ideal.api.Turma.TurmaRepository;
 import papelaria.ideal.api.aluno.records.DadosAtualizacaoAluno;
 import papelaria.ideal.api.aluno.records.DadosCadastroAluno;
+import papelaria.ideal.api.aluno.records.DadosFiltragemAluno;
 import papelaria.ideal.api.cliente.ClienteRepository;
 import papelaria.ideal.api.errors.ValidacaoException;
 import papelaria.ideal.api.utils.Functions;
@@ -21,6 +26,8 @@ public class AlunoService {
     private ClienteRepository clienteRepository;
 	@Autowired
 	private TurmaRepository turmaRepository;
+	@PersistenceContext
+	private EntityManager entityManager;
 
     public void cadastrar(DadosCadastroAluno dados) {
         validarIntegridade(dados);
@@ -177,4 +184,9 @@ public class AlunoService {
 
 		aluno.setDataAtualizacao(LocalDateTime.now());
     }
+
+	public Page<Aluno> filtrar(DadosFiltragemAluno dadosFiltros, Pageable pageable) {
+		var alunoQueryNative = new AlunoQueryNative(entityManager);
+		return alunoQueryNative.filtrar(dadosFiltros, pageable);
+	}
 }
