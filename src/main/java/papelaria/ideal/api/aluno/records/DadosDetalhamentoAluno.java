@@ -11,7 +11,7 @@ public record DadosDetalhamentoAluno(
 		String rg,
 		String cpf,
 		Long turmaId,
-		Long clienteId,
+		Long clienteResponsavelId,
 		LocalDateTime dataCadastro,
 		LocalDateTime dataAtualizacao
 ) {

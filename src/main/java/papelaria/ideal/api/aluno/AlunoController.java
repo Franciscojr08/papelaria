@@ -8,7 +8,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import papelaria.ideal.api.Serie.records.DadosComboSerie;
 import papelaria.ideal.api.aluno.records.*;
 import papelaria.ideal.api.errors.DadosResponse;
 import papelaria.ideal.api.errors.ValidacaoException;
